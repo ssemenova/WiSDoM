@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 public class SLARecommendation {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
+    	long now = System.currentTimeMillis();
 		// some constants
         int Rn = 10; // num tightens
         int Rincrement = 5000;
@@ -71,15 +72,15 @@ public class SLARecommendation {
 		}
 
 		minimizeList(cost, numSLAToRecommend);
+
+		System.out.println(System.currentTimeMillis() - now);
     }
 
     public static void minimizeList(List<Integer> cost, int numToRec) {
-    	System.out.println(cost);
     	int[] minPairIndex = new int[2];
 		while (cost.size() > 3) {
 			minPairIndex = findMin(cost);
 			cost.remove(minPairIndex[1]); //remove the first one
-			System.out.println("cost after removal = " + cost);
 		}
 		System.out.println(cost);
 	}
@@ -98,36 +99,6 @@ public class SLARecommendation {
 				index2 = i + 1;
 			}
 		}
-		System.out.println("indexes and curr=" + index1 + " " + index2 + " " + curr);
 		return new int[]{index1, index2};
 	}
-
-//    public static void generateModelsAndCost(int startLatency, int startPenalty, int setSize, int numQueries) throws ExecutionException, InterruptedException {
-//        WorkloadSpecification wf = new WorkloadSpecification(
-//                latency,
-//                ios,
-//                new VMType[]{VMType.T2_SMALL},
-//                new MaxLatencySLA(startLatency, startPenalty));
-//
-//        String training = WiSeDBUtils.constructTrainingData(wf, setSize, numQueries).get();
-//
-//        Map<Integer, Integer> queryFreqs = new HashMap<>();
-//        queryFreqs.put(1, 2);
-//        queryFreqs.put(2, 2);
-//        queryFreqs.put(3, 2);
-//
-//        calculateCost(training, wf);
-//    }
-
-    public static int calculateCost(String training, WorkloadSpecification wf) {
-        Map<Integer, Integer> queryFreqs = new HashMap<>();
-        queryFreqs.put(1, 500);
-        queryFreqs.put(2, 500);
-        queryFreqs.put(3, 500);
-
-        ByteArrayInputStream bis = new ByteArrayInputStream(training.getBytes());
-        List<AdvisorAction> a = WiSeDBUtils.doPlacement(bis, wf, queryFreqs);
-
-        return CostUtils.getCostForPlan(wf, a);
-    }
 }

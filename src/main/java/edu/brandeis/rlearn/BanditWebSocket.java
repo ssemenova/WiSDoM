@@ -7,9 +7,8 @@ import org.eclipse.jetty.websocket.api.WebSocketListener;
 
 import com.eclipsesource.json.Json;
 
-import edu.brandeis.rlearn.banditdb.BanditDBSimulator;
-import edu.brandeis.rlearn.banditdb.BanditDBSimulatorListener;
-
+import edu.brandeis.wisedb.rlearn.BanditDBSimulator;
+import edu.brandeis.wisedb.rlearn.BanditDBSimulatorListener;
 
 public class BanditWebSocket implements WebSocketListener, BanditDBSimulatorListener {
 

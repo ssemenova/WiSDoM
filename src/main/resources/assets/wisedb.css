@@ -1,0 +1,11 @@
+#data {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-itmes: flex-start;
+}
+
+.vm {
+    width: 300px;
+    border: 1px solid black;
+}

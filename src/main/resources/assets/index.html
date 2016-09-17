@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>R Learn</title>
+    <link rel="stylesheet" type="text/css" href="wisedb.css" />
+    <script src="vue.min.js"></script>
+    <script src="index.js"></script>
+  </head>
+
+  <body>
+    <div id="data">
+      <div class="vm" v-for="(value, key) in vms">
+        <p>VM ID: {{ key }}</p>
+        <p>VM state: {{ value.state }}</p>
+        <p>
+          Queries:
+          <ol>
+            <li v-for="q in value.queue">{{q}}</li>
+          </ol>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

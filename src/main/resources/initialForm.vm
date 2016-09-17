@@ -1,0 +1,26 @@
+<h1>Templates</h1>
+<section id="initialData">
+    <form ic-post-to="/sendInitialData">
+        <h2>Choose templates</h2>
+        <ul class="template-list">
+            #foreach($template in $templates.keySet())
+                <div class="form-group">
+                    <label for="$template">$templates.get($template)</label>
+                    <input id="$template" name="template$template" type="checkbox" class="toggle">
+                </div>
+            #end
+        </ul>
+        <ul class="learning-method">
+            <h2>Learning method</h2>
+            <div class="form-group">
+                <label for="slearn">slearn</label>
+                <input id="slearn" name="slearn" type="radio">
+            </div>
+            <div class="form-group">
+                <label for="rlearn">rlearn</label>
+                <input id="rlearn" name="rlearn" type="radio">
+            </div>
+        </ul>
+        <button type="submit" class="btn" ic-target='#numQueriesForm'>Submit</button>
+    </form>
+</section>

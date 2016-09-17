@@ -1,0 +1,15 @@
+<h1>Choose number of queries</h1>
+<section id="initialData">
+    <form ic-post-to="/sendNumQueries">
+        <h2>Choose templates</h2>
+        <ul class="template-list">
+            #foreach($template in $templates.keySet())
+                <div class="form-group">
+                    <label for="$template">$templates.get($template)</label>
+                    <input id="$template" name="template$template" class="toggle">
+                </div>
+            #end
+        </ul>
+        <button type="submit" class="btn">Submit</button>
+    </form>
+</section>

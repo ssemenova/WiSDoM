@@ -1,6 +1,6 @@
-<h1>Templates</h1>
+<h1>Initial Data</h1>
 <section id="initialData">
-    <form ic-post-to="/sendInitialData">
+    <form>
         <h2>Choose templates</h2>
         <ul class="template-list">
             #foreach($template in $templates.keySet())
@@ -10,17 +10,7 @@
                 </div>
             #end
         </ul>
-        <ul class="learning-method">
-            <h2>Learning method</h2>
-            <div class="form-group">
-                <label for="slearn">slearn</label>
-                <input id="slearn" name="slearn" type="radio">
-            </div>
-            <div class="form-group">
-                <label for="rlearn">rlearn</label>
-                <input id="rlearn" name="rlearn" type="radio">
-            </div>
-        </ul>
-        <button type="submit" class="btn" ic-target='#numQueriesForm'>Submit</button>
+        <button type="submit" class="btn" ic-post-to="/sendInitialDataS" ic-target="body">SLEARN</button>
+        <button type="submit" class="btn" ic-post-to="/sendInitialDataR" ic-target='body'>RLEARN</button>
     </form>
 </section>

@@ -12,19 +12,23 @@ import spark.ModelAndView;
 
 public class Server {
 	public static void main(String[] args) {
-		Session session = new Session();
-//		webSocket("/bandit", BanditWebSocket.class);
+//		Session session = new Session();
+		webSocket("/bandit", BanditWebSocket.class);
 		staticFiles.location("/assets");
 
-		get("/wise", (req, res) -> render(req), new VelocityTemplateEngine());
+		get("/", (req, res) -> renderFirstPage(req));
 
-		post("/sendInitialData", (req, res) -> sendInitialData(req));
+		post("/sendInitialDataS", (req, res) -> sendInitialDataS(req));
+		post("/sendInitialDataR", (req, res) -> sendInitialDataR(req));
 		post("/sendNumQueries", (req, res) -> sendNumQueries(req)); //for slearn
 		init();
-
 	}
 
-	public static ModelAndView render(spark.Request req) {
+	private static String renderTemplate(Map model) {
+		return new VelocityTemplateEngine().render(new ModelAndView(model, "index.vm"));
+	}
+
+	public static String renderFirstPage(spark.Request req) {
 		HashMap model = new HashMap();
 		model.put("initial-Data-Form", "initialForm.vm");
 
@@ -33,7 +37,7 @@ public class Server {
 
 		model.put("templates", templates);
 		model.put("latency", latency);
-		return new ModelAndView(model, "index.vm");
+		return renderTemplate(model);
 	}
 
 	public static Hashtable<Integer, String> defineTemplates() {
@@ -62,23 +66,35 @@ public class Server {
 		return latency;
 	}
 
-	public static ModelAndView sendInitialData(spark.Request req) {
+	public static String sendInitialDataS(spark.Request req) {
 		HashMap model = new HashMap();
-		String learnMethod = (req.queryParams("slearn").equals("on")) ? "s" : "r";
 
+		model.put("templates", templatesChosen(req.queryParams()));
+		model.put("initial-Data-Form", "initialFormFilled.vm");
+		model.put("step-Two", "data-s-display.vm");
+
+		return renderTemplate(model);
+	}
+
+	public static List<String> templatesChosen(Set<String> params) {
 		List<String> templatesChosen = new LinkedList<>();
-		for (String param : req.queryParams()) {
+		for (String param : params) {
 			if (param.contains("template")) {
 				templatesChosen.add(param.substring(8));
 			}
 		}
 
-		model.put("initial-Data-Form", "initialForm.vm");
+		return templatesChosen;
+	}
 
-		if (learnMethod.equals("s")) {
-			return new ModelAndView(model, "index.vm");
-		}
-		return new ModelAndView(model, "");
+	public static String sendInitialDataR(spark.Request req) {
+		HashMap model = new HashMap();
+
+		model.put("templates", templatesChosen(req.queryParams()));
+		model.put("initial-Data-Form", "initialFormFilled.vm");
+		model.put("step-Two", "data-r-display.vm");
+
+		return renderTemplate(model);
 	}
 
 	public static ModelAndView sendNumQueries(spark.Request req) {

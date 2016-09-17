@@ -1,17 +1,24 @@
-<html>
-  <head>
-    <title>Bloop</title>
-    <!--<script src="assets/index.js"></script>-->
-  </head>
-
-  <body>
-    <div id="data"></div>
-    #parse( $initial-Data-Form )
-
-    <div id="numQueriesForm"></div>
-
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>R Learn</title>
+    <link rel="stylesheet" type="text/css" href="wisedb.css" />
+    <script src="vue.min.js"></script>
+    <script src="index.js"></script>
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="http://cdn.intercoolerjs.org/intercooler-1.0.0.min.js"></script>
-  </body>
+</head>
+
+<body>
+
+  #parse( $initial-Data-Form )
+
+  <div id="numQueriesForm"></div>
+
+  <div id="stepTwo">
+    #parse ($step-Two)
+  </div>
+
+</body>
 </html>

@@ -1,0 +1,12 @@
+<h1>Choose amount of each query</h1>
+<section id="initialData">
+    <form>
+        #foreach($template in $templates.keySet())
+            <div class="form-group">
+                <label for="$template">$templates.get($template)</label>
+                <input id="$template" name="value$template" type="value" class="toggle">
+            </div>
+        #end
+        <button type="submit" class="btn" ic-post-to="/sendSLA2" ic-target="body">DO IT!</button>
+    </form>
+</section>

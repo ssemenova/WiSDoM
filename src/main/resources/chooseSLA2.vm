@@ -1,0 +1,10 @@
+<h1>Choose SLA Again</h1>
+<section id="initialData">
+    <form>
+        <h2>Are you sure about that?</h2>
+
+        #foreach($SLA in $SLARecs)
+            <button type="submit" class="btn" ic-post-to="/sendSLA" ic-target="body">DO IT!</button>
+        #end
+    </form>
+</section>

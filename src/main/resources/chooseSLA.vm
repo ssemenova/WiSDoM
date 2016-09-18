@@ -1,0 +1,16 @@
+<h1>Choose SLA</h1>
+<section id="initialData">
+    <form>
+        <h2>Choose SLA type</h2>
+            <select>
+                <option value="average">Average</option>
+                <option value="percentile">Percentile</option>
+                <option value="max">Max</option>
+            </select>
+
+        <h2>Choose value</h2>
+            <input type="text" name="value">
+
+        <button type="submit" class="btn" ic-post-to="/sendSLA" ic-target="body">DO IT!</button>
+    </form>
+</section>

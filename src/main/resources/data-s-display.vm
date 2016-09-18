@@ -1,5 +1,0 @@
-#foreach($template in $templates.keySet())
-    <div class="templates">
-        $templates.get($template)
-    </div>
-#end

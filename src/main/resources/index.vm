@@ -6,6 +6,9 @@
     <link rel="stylesheet" type="text/css" href="wisedb.css" />
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="http://cdn.intercoolerjs.org/intercooler-1.0.0.min.js"></script>
+    <script type="application/javascript" src="vue.min.js"></script>
+	<script type="application/javascript" src="doBandit.js"></script>
+    
 </head>
 
 <body>

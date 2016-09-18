@@ -4,7 +4,7 @@ function url(s) {
 }
 
 
-document.addEventListener("DOMContentLoaded", function () {
+function runBandit(){
     let main = new Vue({
         el: '#data',
         data: {
@@ -69,4 +69,4 @@ document.addEventListener("DOMContentLoaded", function () {
             break;
         }
     };
-});
+}

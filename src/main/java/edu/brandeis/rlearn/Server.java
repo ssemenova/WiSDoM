@@ -29,7 +29,6 @@ public class Server {
 		post("/sendSLA", (req, res) -> sendSLA(req));
 		post("/sendNumQueries", (req, res) -> sendNumQueries(req)); //for slearn
 		post("/sendSLA2", (req, res) -> sendSLA2(req));
-		post("doSLEARN", (req, res) -> doSLEARN(req));
 		init();
 	}
 
@@ -43,7 +42,7 @@ public class Server {
 
 		model.put("templates", templates);
 		model.put("latencies", latencies);
-		return renderTemplate(model);
+		return renderTemplate(model, "index.vm");
 	}
 
 	public static String sendInitialDataS(spark.Request req) {
@@ -56,7 +55,7 @@ public class Server {
 		session.addTemplates(templatesChosen);
 		model.put("next-Step", "chooseSLA.vm");
 
-		return renderTemplate(model);
+		return renderTemplate(model, "chooseSLA.vm");
 	}
 
 	public static String sendInitialDataR(spark.Request req) {
@@ -69,7 +68,7 @@ public class Server {
 		session.addTemplates(templatesChosen);
 		model.put("next-Step", "chooseSLA.vm");
 
-		return renderTemplate(model);
+		return renderTemplate(model, "chooseSLA.vm");
 	}
 
 	public static String sendSLA(spark.Request req) {
@@ -81,11 +80,11 @@ public class Server {
 		if (session.isSLEARN()) {
 			model.put("next-Step", "chooseNumQueries.vm");
 			model.put("templates", session.getTemplates());
+			return renderTemplate(model, "chooseNumQueries.vm");
 		} else {
 			model.put("next-Step", "doRLEARN.vm");
+			return renderTemplate(model, "doRLEARN.vm");
 		}
-
-		return renderTemplate(model);
 	}
 
 	public static String sendNumQueries(spark.Request req) {
@@ -96,7 +95,7 @@ public class Server {
 			model.put("next-step", "chooseSLA2.vm");
 			model.put("SLArecs", session.recommendSLA(latencies, forMachine));
 		}
-		return renderTemplate(model);
+		return renderTemplate(model, "chooseSLA2.vm");
 	}
 
 	public static String sendSLA2(spark.Request req) {
@@ -104,14 +103,10 @@ public class Server {
 		Session session = getSessionFromMap(req);
 
 		if (session.isSLEARN()) {
-			model.put("next-step", "chooseSLA2.vm");
+			model.put("next-step", "doSLEARN.vm");
 			model.put("SLArecs", session.recommendSLA(latencies, forMachine));
 		}
-		return renderTemplate(model);
-	}
-
-	public static String doSLEARN(spark.Request req) {
-		return "";
+		return renderTemplate(model, "doSLEARN.vm");
 	}
 
 	/* helpers */
@@ -119,8 +114,8 @@ public class Server {
 		return sessionMap.get(req.session().id());
 	}
 
-	private static String renderTemplate(Map model) {
-		return new VelocityTemplateEngine().render(new ModelAndView(model, "index.vm"));
+	private static String renderTemplate(Map model, String template) {
+		return new VelocityTemplateEngine().render(new ModelAndView(model, template));
 	}
 
 	public static Hashtable<Integer, String> templatesChosen(Set<String> params) {

@@ -1,6 +1,4 @@
-<script src="vue.min.js"></script>
-<script src="doBandit.js"></script>
-
+<div id="data">
 <div class="vm" v-for="(value, key) in vms">
     <p>VM ID: {{ key }}</p>
     <p>VM state: {{ value.state }}</p>
@@ -11,3 +9,8 @@
     </ol>
     </p>
 </div>
+</div>
+
+<script type="application/javascript">
+runBandit();
+</script>

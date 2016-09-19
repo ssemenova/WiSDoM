@@ -1,36 +1,52 @@
 package edu.brandeis.rlearn;
 
-import edu.brandeis.wisedb.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import edu.brandeis.wisedb.AdaptiveModelingUtils;
+import edu.brandeis.wisedb.CostUtils;
+import edu.brandeis.wisedb.WiSeDBCachedModel;
+import edu.brandeis.wisedb.WiSeDBUtils;
+import edu.brandeis.wisedb.WorkloadSpecification;
 import edu.brandeis.wisedb.aws.VMType;
 import edu.brandeis.wisedb.cost.sla.MaxLatencySLA;
-
-import java.util.*;
 
 /**
  * Created by seaurchi on 9/17/16.
  */
 public class Session {
-    private Hashtable<Integer, String> templates;
+    private HashMap<Integer, String> templates;
+    private Map<Integer, Integer> queryFreqs;
+    private List<RecommendedSLA> recommendations;
     private String learnType;
     private String SLAtype;
-    private final int Rn = 10; // num tightens
-    private final int Rincrement = 5000;
-    private final int numQueries = 9;
-    private final int numWorkloads = 250;
+  
     private int startLatency;
     private final int penalty = 1; //penalty for initial SLA
     private final int numSLAToRecommend = 3; // num of SLAs to recommend
 
+    private static final Map<Integer, Integer> templateToLatency = new HashMap<>();
 
-    public Session() {
-        templates = new Hashtable<>();
+    
+    static {
+    	templateToLatency.put(1, 2000);
+    	templateToLatency.put(2, 3000);
+    	templateToLatency.put(3, 4000);
     }
 
-    public void addTemplates(Hashtable<Integer, String> templates) {
+    public Session() {
+        templates = new HashMap<>();
+    }
+
+    public void setTemplates(HashMap<Integer, String> templates) {
         this.templates = templates;
     }
 
-    public Hashtable<Integer, String> getTemplates() {
+    public HashMap<Integer, String> getTemplates() {
         return templates;
     }
 
@@ -47,21 +63,25 @@ public class Session {
         startLatency = Integer.parseInt(value);
     }
 
-    public List<Integer> recommendSLA(Map<Integer, Map<VMType, Integer>> latency, Map<VMType, Integer> forMachine) {
+    public void recommendSLA() {
         Map<Integer, Map<VMType, Integer>> ios = new HashMap<>();
-        forMachine = new HashMap<>();
-        forMachine.put(VMType.T2_SMALL, 10);
-        ios.put(1, forMachine);
-
-        forMachine = new HashMap<>();
-        forMachine.put(VMType.T2_SMALL, 10);
-        ios.put(2, forMachine);
-
-        forMachine = new HashMap<>();
-        forMachine.put(VMType.T2_SMALL, 10);
-        ios.put(3, forMachine);
-
-        int loosestLatency = startLatency + ((Rincrement * Rn)/2);
+        Map<Integer, Map<VMType, Integer>> latency = new HashMap<>();
+        
+        for (Integer selectedTemplate : templates.keySet()) {
+        	// say that every query takes 1 IO
+        	Map<VMType, Integer> iosForThisQuery = new HashMap<>();
+        	iosForThisQuery.put(VMType.T2_SMALL, 1);
+        	ios.put(selectedTemplate, iosForThisQuery);
+        	
+        	Map<VMType, Integer> latencyForThisQuery = new HashMap<>();
+        	latencyForThisQuery.put(VMType.T2_SMALL, templateToLatency.get(selectedTemplate));
+        	latency.put(selectedTemplate, latencyForThisQuery);
+        }
+        
+        // TODO: select these variables in a smarter way
+        int loosestLatency = startLatency + 10000;
+        int increment = 1000;
+        int numSteps = 20;
 
         WorkloadSpecification wf = new WorkloadSpecification(
                 latency,
@@ -69,26 +89,29 @@ public class Session {
                 new VMType[] { VMType.T2_SMALL },
                 new MaxLatencySLA(loosestLatency, penalty));
 
-        List<WiSeDBCachedModel> models = AdaptiveModelingUtils.tightenAndRetrain(wf, Rincrement, Rn, numQueries, numWorkloads);
-
-        Map<Integer, Integer> freqs = new HashMap<>();
-        freqs.put(1, 100);
-        freqs.put(2, 100);
-        freqs.put(3, 100);
-
+        List<WiSeDBCachedModel> models = AdaptiveModelingUtils.tightenAndRetrain(wf, increment, numSteps, 9, 200);
         List<Integer> cost = new LinkedList<Integer>();
+        
         for (WiSeDBCachedModel model : models) {
             cost.add(CostUtils.getCostForPlan(model.getWorkloadSpecification(),
-                    WiSeDBUtils.doPlacement(model, freqs)));
+                    WiSeDBUtils.doPlacement(model, queryFreqs)));
         }
-
-        return minimizeList(cost, numSLAToRecommend);
+        
+        recommendations = new LinkedList<>();
+        for (int i = 0; i < cost.size(); i++) {
+        	recommendations.add(new RecommendedSLA(loosestLatency + increment * i, models.get(i), cost.get(i)));
+        }
+        recommendations = minimizeList(recommendations, numSLAToRecommend);
+    }
+    
+    public List<RecommendedSLA> getRecommendations() {
+    	return recommendations;
     }
 
-    private List<Integer> minimizeList(List<Integer> cost, int numToRec) {
+    private List<RecommendedSLA> minimizeList(List<RecommendedSLA> cost, int numToRec) {
         int[] minPairIndex = new int[2];
-        while (cost.size() > 3) {
-            minPairIndex = findMin(cost);
+        while (cost.size() > numToRec) {
+            minPairIndex = findMin(cost.stream().map(r -> r.getCost()).collect(Collectors.toList()));
             cost.remove(minPairIndex[1]); //remove the first one
         }
         return cost;
@@ -110,6 +133,10 @@ public class Session {
         }
         return new int[]{index1, index2};
     }
+
+	public void setQueryFreqs(Map<Integer, Integer> queryFreqs) {
+		this.queryFreqs = queryFreqs;
+	}
 
 
 }

@@ -2,6 +2,8 @@ package edu.brandeis.rlearn;
 
 import java.util.*;
 
+import org.apache.velocity.VelocityContext;
+
 import static spark.Spark.*;
 
 import edu.brandeis.wisedb.aws.VMType;
@@ -11,7 +13,7 @@ import spark.ModelAndView;
 public class Server {
 
 	private static HashMap<String, Session> sessionMap = new HashMap<>();
-	private static Hashtable<Integer, String> templates = new Hashtable<>();
+	private static HashMap<Integer, String> templates = new HashMap<>();
 	private static Map<Integer, Map<VMType, Integer>> latencies = new HashMap<>();
 	private static Map<VMType, Integer> forMachine = new HashMap<>();
 
@@ -29,6 +31,11 @@ public class Server {
 		post("/sendSLA", (req, res) -> sendSLA(req));
 		post("/sendNumQueries", (req, res) -> sendNumQueries(req)); //for slearn
 		post("/sendSLA2", (req, res) -> sendSLA2(req));
+		
+		exception(Exception.class, (e, req, res) -> {
+			e.printStackTrace();
+		});
+		
 		init();
 	}
 
@@ -48,11 +55,11 @@ public class Server {
 	public static String sendInitialDataS(spark.Request req) {
 		HashMap model = new HashMap();
 		Session session = getSessionFromMap(req);
-		Hashtable<Integer, String> templatesChosen = templatesChosen(req.queryParams());
+		HashMap<Integer, String> templatesChosen = templatesChosen(req.queryParams());
 
 		session.setLearnType("S");
 		model.put("templates", templatesChosen);
-		session.addTemplates(templatesChosen);
+		session.setTemplates(templatesChosen);
 		model.put("next-Step", "chooseSLA.vm");
 
 		return renderTemplate(model, "chooseSLA.vm");
@@ -61,11 +68,11 @@ public class Server {
 	public static String sendInitialDataR(spark.Request req) {
 		HashMap model = new HashMap();
 		Session session = getSessionFromMap(req);
-		Hashtable<Integer, String> templatesChosen = templatesChosen(req.queryParams());
+		HashMap<Integer, String> templatesChosen = templatesChosen(req.queryParams());
 
 		session.setLearnType("R");
 		model.put("templates", templatesChosen(req.queryParams()));
-		session.addTemplates(templatesChosen);
+		session.setTemplates(templatesChosen);
 		model.put("next-Step", "chooseSLA.vm");
 
 		return renderTemplate(model, "chooseSLA.vm");
@@ -88,23 +95,38 @@ public class Server {
 	}
 
 	public static String sendNumQueries(spark.Request req) {
-		HashMap model = new HashMap();
+		Map<String, Object> model = new HashMap<>();
 		Session session = getSessionFromMap(req);
-
+		Map<Integer, Integer> queryFreqs = new HashMap<>();
+		
+		
+		for (String s : req.queryParams()) {
+			if (s.startsWith("templatecount-")) {
+				int tID  = Integer.valueOf(s.substring("templatecount-".length()));
+				int freq = Integer.valueOf(req.queryParams(s));
+				queryFreqs.put(tID, freq);
+			}
+		}
+		
+		// TODO: make sure they entered at least some queries of each template?
+		session.setQueryFreqs(queryFreqs);
+		session.recommendSLA();
 		if (session.isSLEARN()) {
 			model.put("next-step", "chooseSLA2.vm");
-			model.put("SLArecs", session.recommendSLA(latencies, forMachine));
+			model.put("SLARecs", session.getRecommendations());
 		}
+		
 		return renderTemplate(model, "chooseSLA2.vm");
 	}
 
 	public static String sendSLA2(spark.Request req) {
-		HashMap model = new HashMap();
+		Map<String, Object> model = new HashMap<String, Object>();
 		Session session = getSessionFromMap(req);
-
+		session.recommendSLA();
+		
 		if (session.isSLEARN()) {
 			model.put("next-step", "doSLEARN.vm");
-			model.put("SLArecs", session.recommendSLA(latencies, forMachine));
+			// TODO get the recommended SLA that was selected
 		}
 		return renderTemplate(model, "doSLEARN.vm");
 	}
@@ -114,12 +136,12 @@ public class Server {
 		return sessionMap.get(req.session().id());
 	}
 
-	private static String renderTemplate(Map model, String template) {
+	private static String renderTemplate(Object model, String template) {
 		return new VelocityTemplateEngine().render(new ModelAndView(model, template));
 	}
 
-	public static Hashtable<Integer, String> templatesChosen(Set<String> params) {
-		Hashtable<Integer, String> templatesChosen = new Hashtable<>();
+	public static HashMap<Integer, String> templatesChosen(Set<String> params) {
+		HashMap<Integer, String> templatesChosen = new HashMap<>();
 		for (String param : params) {
 			if (param.contains("template")) {
 				templatesChosen.put(Integer.valueOf(param.substring(8)), templates.get(Integer.valueOf(param.substring(8))));

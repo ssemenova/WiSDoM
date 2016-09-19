@@ -4,9 +4,9 @@
         #foreach($template in $templates.keySet())
             <div class="form-group">
                 <label for="$template">$templates.get($template)</label>
-                <input id="$template" name="value$template" type="value" class="toggle">
+                <input id="$template" name="templatecount-$template" type="value" class="toggle">
             </div>
         #end
-        <button type="submit" class="btn" ic-post-to="/sendSLA2" ic-target="body">DO IT!</button>
+        <button type="submit" class="btn" ic-post-to="/sendNumQueries" ic-target="body">DO IT!</button>
     </form>
 </section>

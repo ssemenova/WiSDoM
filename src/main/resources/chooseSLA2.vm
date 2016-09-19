@@ -1,10 +1,10 @@
 <h1>Choose SLA Again</h1>
 <section id="initialData">
-    <form>
         <h2>Are you sure about that?</h2>
 
-        #foreach($SLA in $SLARecs)
-            <button type="submit" class="btn" ic-post-to="/sendSLA" ic-target="body">DO IT!</button>
-        #end
-    </form>
+	<ul>
+   	#foreach($SLA in $SLARecs)
+    	<li>Deadline: $SLA.getDeadline(), cost estimate: $SLA.getCost() <form><input type="hidden" name="slaIdx" value="$foreach.index" /><button type="submit" class="btn" ic-post-to="/sendSLA" ic-target="body">DO IT!</button></form></li>
+   	#end
+	</ul>	
 </section>

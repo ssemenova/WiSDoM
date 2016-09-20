@@ -5,12 +5,13 @@
         <ul class="template-list">
             #foreach($template in $templates.keySet())
                 <div class="form-group">
-                    <label for="$template">$templates.get($template)</label>
                     <input id="$template" name="template$template" type="checkbox" class="toggle">
+                    <label for="$template">$templates.get($template)</label>
+
                 </div>
             #end
         </ul>
-        <button type="submit" class="btn" ic-post-to="/sendInitialDataS" ic-target="body">SLEARN</button>
-        <button type="submit" class="btn" ic-post-to="/sendInitialDataR" ic-target='body'>RLEARN</button>
+        <button type="submit" class="btn" ic-post-to="/sendInitialDataS" ic-target="#step" ic-indicator="#indicator">SLEARN</button>
+        <button type="submit" class="btn" ic-post-to="/sendInitialDataR" ic-target='#step' ic-indicator="#indicator">RLEARN</button>
     </form>
 </section>

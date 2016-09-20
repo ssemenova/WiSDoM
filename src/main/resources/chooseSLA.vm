@@ -2,15 +2,17 @@
 <section id="initialData">
     <form>
         <h2>Choose SLA type</h2>
-            <select>
-                <option value="average">Average</option>
-                <option value="percentile">Percentile</option>
-                <option value="max">Max</option>
-            </select>
+            <div class="input-field col s12">
+                <select name="type">
+                    <option value="average">Average</option>
+                    <option value="percentile">Percentile</option>
+                    <option value="max">Max</option>
+                </select>
+            </div>
 
         <h2>Choose value</h2>
-            <input type="text" name="value">
+        <input type="text" name="value">
 
-        <button type="submit" class="btn" ic-post-to="/sendSLA" ic-target="body">DO IT!</button>
+        <button type="submit" class="btn" ic-post-to="/sendSLA" ic-target="#step" ic-indicator="#indicator">DO IT!</button>
     </form>
 </section>

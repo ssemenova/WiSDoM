@@ -83,6 +83,8 @@ public class Server {
 		Session session = getSessionFromMap(req);
 
 		session.addSLA1(req.queryParams("type"), req.queryParams("value"));
+		model.put("SLAvalue", req.queryParams("value"));
+		model.put("SLAtype", req.queryParams("type"));
 
 		if (session.isSLEARN()) {
 			model.put("next-Step", "chooseNumQueries.vm");

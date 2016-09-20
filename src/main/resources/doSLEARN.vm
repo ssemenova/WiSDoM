@@ -1,0 +1,5 @@
+<ol>
+#foreach ($action in $actions)
+<li>$action</li>
+#end
+</ol>

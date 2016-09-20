@@ -1,14 +1,20 @@
 package edu.brandeis.rlearn;
 
-import java.util.*;
+import static spark.Spark.exception;
+import static spark.Spark.get;
+import static spark.Spark.init;
+import static spark.Spark.post;
+import static spark.Spark.staticFiles;
+import static spark.Spark.webSocket;
 
-import org.apache.velocity.VelocityContext;
-
-import static spark.Spark.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import edu.brandeis.wisedb.aws.VMType;
-import spark.template.velocity.*;
 import spark.ModelAndView;
+import spark.template.velocity.VelocityTemplateEngine;
 
 public class Server {
 
@@ -122,12 +128,15 @@ public class Server {
 	public static String sendSLA2(spark.Request req) {
 		Map<String, Object> model = new HashMap<String, Object>();
 		Session session = getSessionFromMap(req);
-		session.recommendSLA();
 		
 		if (session.isSLEARN()) {
 			model.put("next-step", "doSLEARN.vm");
-			// TODO get the recommended SLA that was selected
+			session.setSLAIndex(Integer.valueOf(req.queryParams("slaIdx")));
 		}
+		model.put("actions", session.doPlacementWithSelected()
+				.stream()
+				.map(a -> a.toString())
+				.collect(Collectors.toList()));
 		return renderTemplate(model, "doSLEARN.vm");
 	}
 

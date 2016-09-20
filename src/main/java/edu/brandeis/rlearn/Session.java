@@ -1,6 +1,5 @@
 package edu.brandeis.rlearn;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,6 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.brandeis.wisedb.AdaptiveModelingUtils;
+import edu.brandeis.wisedb.AdvisorAction;
 import edu.brandeis.wisedb.CostUtils;
 import edu.brandeis.wisedb.WiSeDBCachedModel;
 import edu.brandeis.wisedb.WiSeDBUtils;
@@ -24,6 +24,7 @@ public class Session {
     private List<RecommendedSLA> recommendations;
     private String learnType;
     private String SLAtype;
+    private int slaIdx;
   
     private int startLatency;
     private final int penalty = 1; //penalty for initial SLA
@@ -106,6 +107,18 @@ public class Session {
     
     public List<RecommendedSLA> getRecommendations() {
     	return recommendations;
+    }
+    
+    public void setSLAIndex(int idx) {
+    	this.slaIdx = idx;
+    }
+    
+    public List<AdvisorAction> doPlacementWithSelected() {
+    	return WiSeDBUtils.doPlacement(recommendations.get(slaIdx).getModel(), queryFreqs);
+    }
+    
+    public int getSelectedSLA() {
+    	return this.slaIdx;
     }
 
     private List<RecommendedSLA> minimizeList(List<RecommendedSLA> cost, int numToRec) {

@@ -1,5 +1,22 @@
-<ol>
-#foreach ($action in $actions)
-<li>$action</li>
-#end
-</ol>
+<div class="panel panel-default">
+	<div class="panel-heading">Recommended Strategy</div>
+	<div class="panel-body">
+		<dl class="dl-horizontal">
+		  <dt>Number of VMs</dt>
+		  <dd>$numVMs VMs</dd>
+		  <dt>Number of Queries</dt>
+		  <dd>$numQueries queries</dd>
+		  <dt>Query density</dt>
+		  <dd>$queryDensity queries per VM</dd>
+		  <dt>Deadline</dt>
+		  <dd>$sla.getDeadlineSeconds() seconds</dd>
+		  <dt>Total cost of strategy</dt>
+		  <dd>$cost 1/10th cent</dd>
+		</dl>
+		<ol>
+		#foreach ($action in $actions)
+		<li>$action</li>
+		#end
+		</ol>
+	</div>
+</div>

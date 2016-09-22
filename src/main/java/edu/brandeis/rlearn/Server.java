@@ -7,11 +7,17 @@ import static spark.Spark.post;
 import static spark.Spark.staticFiles;
 import static spark.Spark.webSocket;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import edu.brandeis.wisedb.AdvisorAction;
+import edu.brandeis.wisedb.AdvisorActionAssign;
+import edu.brandeis.wisedb.AdvisorActionProvision;
+import edu.brandeis.wisedb.CostUtils;
 import edu.brandeis.wisedb.aws.VMType;
 import spark.ModelAndView;
 import spark.template.velocity.VelocityTemplateEngine;
@@ -141,10 +147,28 @@ public class Server {
 				session.setSLAIndex(Integer.valueOf(req.queryParams("slaIdx")));
 			}
 		}
+		List<AdvisorAction> actions = session.doPlacementWithSelected();
 		model.put("actions", session.doPlacementWithSelected()
 				.stream()
 				.map(a -> a.toString())
 				.collect(Collectors.toList()));
+		
+		long numVMs = actions.stream()
+				.filter(aa -> aa instanceof AdvisorActionProvision)
+				.count();
+		
+		long numQueries = actions.stream()
+				.filter(aa -> aa instanceof AdvisorActionAssign)
+				.count();
+		
+		DecimalFormat df = new DecimalFormat(".###");
+		model.put("numVMs", numVMs);
+		model.put("numQueries", numQueries);
+		model.put("queryDensity", df.format(numQueries / numVMs));
+		
+		model.put("sla", session.getSelectedSLA());
+		model.put("cost", CostUtils.getCostForPlan(session.getSelectedSLA().getModel().getWorkloadSpecification(), actions));
+		
 		return renderTemplate(model, "doSLEARN.vm");
 	}
 

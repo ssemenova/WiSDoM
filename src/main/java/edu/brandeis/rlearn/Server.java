@@ -22,6 +22,7 @@ public class Server {
 	private static HashMap<Integer, String> templates = new HashMap<>();
 	private static Map<Integer, Map<VMType, Integer>> latencies = new HashMap<>();
 	private static Map<VMType, Integer> forMachine = new HashMap<>();
+	private static Map<Integer, String> templateDesc = new HashMap<>();
 
 	public static void main(String[] args) {
 		webSocket("/bandit", BanditWebSocket.class);
@@ -37,11 +38,11 @@ public class Server {
 		post("/sendSLA", (req, res) -> sendSLA(req));
 		post("/sendNumQueries", (req, res) -> sendNumQueries(req)); //for slearn
 		post("/sendSLA2", (req, res) -> sendSLA2(req));
-		
+
 		exception(Exception.class, (e, req, res) -> {
 			e.printStackTrace();
 		});
-		
+
 		init();
 	}
 
@@ -50,11 +51,12 @@ public class Server {
 		Session session = new Session();
 		sessionMap.put(req.session().id(), session);
 
-		HashMap model = new HashMap();
+		HashMap<String, Object> model = new HashMap<>();
 		model.put("next-Step", "initialForm.vm");
 
 		model.put("templates", templates);
 		model.put("latencies", latencies);
+		model.put("desc", templateDesc);
 		return renderTemplate(model, "index.vm");
 	}
 
@@ -85,7 +87,7 @@ public class Server {
 	}
 
 	public static String sendSLA(spark.Request req) {
-		HashMap model = new HashMap();
+		HashMap<String, Object> model = new HashMap<String, Object>();
 		Session session = getSessionFromMap(req);
 
 		session.addSLA1(req.queryParams("type"), req.queryParams("value"));
@@ -106,8 +108,7 @@ public class Server {
 		Map<String, Object> model = new HashMap<>();
 		Session session = getSessionFromMap(req);
 		Map<Integer, Integer> queryFreqs = new HashMap<>();
-		
-		
+
 		for (String s : req.queryParams()) {
 			if (s.startsWith("templatecount-")) {
 				int tID  = Integer.valueOf(s.substring("templatecount-".length()));
@@ -115,25 +116,30 @@ public class Server {
 				queryFreqs.put(tID, freq);
 			}
 		}
-		
+
 		// TODO: make sure they entered at least some queries of each template?
 		session.setQueryFreqs(queryFreqs);
 		session.recommendSLA();
 		if (session.isSLEARN()) {
 			model.put("next-step", "chooseSLA2.vm");
 			model.put("SLARecs", session.getRecommendations());
+			model.put("originalSLA", session.getOriginalSLA());
 		}
-		
+
 		return renderTemplate(model, "chooseSLA2.vm");
 	}
 
 	public static String sendSLA2(spark.Request req) {
 		Map<String, Object> model = new HashMap<String, Object>();
 		Session session = getSessionFromMap(req);
-		
+
 		if (session.isSLEARN()) {
 			model.put("next-step", "doSLEARN.vm");
-			session.setSLAIndex(Integer.valueOf(req.queryParams("slaIdx")));
+			if (req.queryParams("slaIdx").equals("original")) {
+				session.setSLAIndex(-1);
+			} else {
+				session.setSLAIndex(Integer.valueOf(req.queryParams("slaIdx")));
+			}
 		}
 		model.put("actions", session.doPlacementWithSelected()
 				.stream()
@@ -175,9 +181,25 @@ public class Server {
 		forMachine.put(VMType.T2_SMALL, 40000);
 		latencies.put(3, forMachine);
 
+		forMachine = new HashMap<>();
+		forMachine.put(VMType.T2_SMALL, 52000);
+		latencies.put(4, forMachine);
+
+		forMachine = new HashMap<>();
+		forMachine.put(VMType.T2_SMALL, 80000);
+		latencies.put(5, forMachine);
+
 		templates.put(1, "SQL QUERY 1");
 		templates.put(2, "SQL QUERY 2");
 		templates.put(3, "SQL QUERY 3");
+		templates.put(4, "SQL QUERY 4");
+		templates.put(5, "SQL QUERY 5");
+
+		templateDesc.put(1, "Filter over fact table");
+		templateDesc.put(2,  "Join fact table with small table");
+		templateDesc.put(3,  "Join fact table with small table + aggregate");
+		templateDesc.put(4,  "Join fact table with two small table");
+		templateDesc.put(5,  "Join fact table with four small tables + aggregate");
 
 	}
 

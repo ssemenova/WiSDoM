@@ -1,15 +1,44 @@
 <h1>Choose SLA Again</h1>
 <section id="initialData">
-        <h2>Are you sure about that?</h2>
+<div class="col-md-6">
+	<div class="panel panel-primary">
+	 	<div class="panel-heading">Original SLA</div>
+	 	<div class="panel-body">
+			<p>We estimate the cost for executing this workload to be
+			<strong>$originalSLA.getCostCents() cents</strong> when using a deadline of 
+			<strong>$originalSLA.getDeadlineSeconds() seconds</strong>.
+			</p>
+			<p>
+			<form>
+				<input type="hidden" name="slaIdx" value="original" />
+				<button type="submit" style="float: right; margin-right: 20px;" class="btn btn-primary pull-xs-right" ic-post-to="/sendSLA2" ic-target="#schedule" ic-indicator="#indicator">Use this SLA</button>
+			</form>
+			</p>
+		</div>
+	</div>
+	
+	<div class="panel panel-default">
+		<div class="panel-heading">Recommended SLAs</div>
+		<div class="panel-body">
+			<table class="table table-striped">
+				<tr>
+					<th>Deadline</th><th>Workload Cost</th><th></th>
+				</tr>		
+	   		#foreach($SLA in $SLARecs)
+				<tr>
+	    			<td>$SLA.getDeadlineSeconds() seconds</td>
+	    			<td>$SLA.getCostCents() cents</td>
+	    			<td><form>
+						<input type="hidden" name="slaIdx" value="$foreach.index" />
+						<button type="submit" class="btn btn-default" ic-post-to="/sendSLA2" ic-target="#schedule" ic-indicator="#indicator">Select</button>
+					</form></td>
+				</tr>
+	   		#end
+			</table>
+		</div>
+	</div>
+</div>
+<div id="schedule" class="col-md-6">
 
-	<ul>
-   	#foreach($SLA in $SLARecs)
-    	<li>Deadline: $SLA.getDeadline(), cost estimate: $SLA.getCost()
-		<form>
-			<input type="hidden" name="slaIdx" value="$foreach.index" />
-			<button type="submit" class="btn" ic-post-to="/sendSLA2" ic-target="#step" ic-indicator="#indicator">DO IT!</button>
-		</form>
-		</li>
-   	#end
-	</ul>	
+</div>
 </section>

@@ -25,5 +25,13 @@ public class RecommendedSLA {
 		return cost;
 	}
 	
+	public int getDeadlineSeconds() {
+		return getDeadline() / 1000;
+	}
+	
+	public int getCostCents() {
+		return getCost() / 10;
+	}
+	
 	
 }

@@ -22,6 +22,7 @@ public class Session {
     private HashMap<Integer, String> templates;
     private Map<Integer, Integer> queryFreqs;
     private List<RecommendedSLA> recommendations;
+    private RecommendedSLA originalSLA;
     private String learnType;
     private String SLAtype;
     private int slaIdx;
@@ -37,6 +38,9 @@ public class Session {
     	templateToLatency.put(1, 2000);
     	templateToLatency.put(2, 3000);
     	templateToLatency.put(3, 4000);
+    	templateToLatency.put(4, 5200);
+    	templateToLatency.put(5, 8000);
+
     }
 
     public Session() {
@@ -83,6 +87,11 @@ public class Session {
         int loosestLatency = startLatency + 10000;
         int increment = 1000;
         int numSteps = 20;
+        
+        // TODO obvi do this with math instead of a loop
+        while (loosestLatency - (increment*numSteps) < 60000 + 8000) {
+        	numSteps--;
+        }
 
         WorkloadSpecification wf = new WorkloadSpecification(
                 latency,
@@ -100,9 +109,17 @@ public class Session {
         
         recommendations = new LinkedList<>();
         for (int i = 0; i < cost.size(); i++) {
-        	recommendations.add(new RecommendedSLA(loosestLatency + increment * i, models.get(i), cost.get(i)));
+        	if (loosestLatency - (increment * i) == startLatency) {
+        		originalSLA = new RecommendedSLA(startLatency, models.get(i), cost.get(i));
+        	}
+        	recommendations.add(new RecommendedSLA(loosestLatency - (increment * i), models.get(i), cost.get(i)));
         }
         recommendations = minimizeList(recommendations, numSLAToRecommend);
+
+    }
+    
+    public RecommendedSLA getOriginalSLA() {
+    	return originalSLA;
     }
     
     public List<RecommendedSLA> getRecommendations() {
@@ -114,11 +131,13 @@ public class Session {
     }
     
     public List<AdvisorAction> doPlacementWithSelected() {
-    	return WiSeDBUtils.doPlacement(recommendations.get(slaIdx).getModel(), queryFreqs);
+    	return WiSeDBUtils.doPlacement(getSelectedSLA().getModel(), queryFreqs);
     }
     
-    public int getSelectedSLA() {
-    	return this.slaIdx;
+    public RecommendedSLA getSelectedSLA() {
+    	if (this.slaIdx == -1)
+    		return originalSLA;
+    	return recommendations.get(slaIdx);
     }
 
     private List<RecommendedSLA> minimizeList(List<RecommendedSLA> cost, int numToRec) {

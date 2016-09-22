@@ -1,17 +1,37 @@
+<div class="col-md-offset-1 col-md-10">
 <h1>Initial Data</h1>
+</div>
 <section id="initialData">
     <form>
-        <h2>Choose templates</h2>
-        <ul class="template-list">
-            #foreach($template in $templates.keySet())
-                <div class="form-group">
-                    <input id="$template" name="template$template" type="checkbox" class="toggle">
-                    <label for="$template">$templates.get($template)</label>
-
-                </div>
-            #end
-        </ul>
-        <button type="submit" class="btn" ic-post-to="/sendInitialDataS" ic-target="#step" ic-indicator="#indicator">SLEARN</button>
-        <button type="submit" class="btn" ic-post-to="/sendInitialDataR" ic-target='#step' ic-indicator="#indicator">RLEARN</button>
+		<div class="col-md-offset-1 col-md-5">
+		<h2>Choose templates</h2>
+			<ul class="template-list">
+    		#foreach($template in $templates.keySet())
+        		<div class="form-group">
+            		<input id="$template" name="template$template" type="checkbox" class="toggle">
+            		<label for="$template">$templates.get($template)</label>
+            		<p>$desc.get($template)</p>
+        		</div>
+    		#end
+			</ul>
+		</div>
+		
+		<div class="col-md-5">
+			<h2>Choose system</h2>
+			<div class="panel panel-default">
+			  	<div class="panel-heading">Supervised Learning</div>
+  				<div class="panel-body">
+  					<p>WiSeDB can generate <strong>decision tree models</strong> tailored to a specific application's workload. This supports <strong>SLA recommendation</strong> and <strong>batch scheduling</strong></p>
+    				<button type="submit" class="pull-xs-right btn btn-primary" ic-post-to="/sendInitialDataS" ic-target="#step" ic-indicator="#indicator">SLEARN</button>
+  				</div>
+			</div>
+			<div class="panel panel-default">
+			  	<div class="panel-heading">Reinforcement Learning</div>
+  				<div class="panel-body">
+  					<p>WiSeDB can use a tiered network of <strong>contextual multi-armed bandits</strong> for <strong>online processing</strong> of queries that <strong>responds to changes on the fly</strong>.</p>
+					<button type="submit" class="pull-xs-right btn btn-primary" ic-post-to="/sendInitialDataR" ic-target='#step' ic-indicator="#indicator">RLEARN</button>		
+  				</div>
+			</div>
+		</div>        
     </form>
 </section>

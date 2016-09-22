@@ -9,3 +9,43 @@
     width: 300px;
     border: 1px solid black;
 }
+
+.t1 {
+    background-color: red;
+}
+.t2 {
+    background-color: green;
+}
+.t3 {
+    background-color: blue;
+}
+.t4 {
+    background-color: yellow;
+}
+
+.t5 {
+    background-color: pink;
+}
+.sphere {
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 500%;
+    position: relative;
+    /*box-shadow: inset -10px -10px 100px #000, 10px 10px 20px black, inset 0px 0px 10px black;*/
+    display: inline-block;
+    margin: 5%;
+}
+.sphere::after {
+    background-color: rgba(255, 255, 255, 0.3);
+    content: '';
+    height: 45%;
+    width: 12%;
+    position: absolute;
+    top: 4%;
+    left: 15%;
+    border-radius: 50%;
+    transform: rotate(40deg);
+}

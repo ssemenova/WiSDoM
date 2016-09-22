@@ -19,7 +19,7 @@
 			<img width="24px" height="24px" src="server.png"  style="display: inline; vertical-align: bottom;" alt="Virtual machine"></a>
 			<ul class="list-inline" style="display: inline; padding-left: 10px;">
 			#foreach ($q in $vm.getQueries())
-				<li>$q</li>
+				<li><div class="sphere t$q"></div></li>
 			#end
 			</ul>
 		</div>

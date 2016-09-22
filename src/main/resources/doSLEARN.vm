@@ -11,12 +11,18 @@
 		  <dt>Deadline</dt>
 		  <dd>$sla.getDeadlineSeconds() seconds</dd>
 		  <dt>Total cost of strategy</dt>
-		  <dd>$cost 1/10th cent</dd>
+		  <dd>$cost cents</dd>
 		</dl>
-		<ol>
-		#foreach ($action in $actions)
-		<li>$action</li>
+		
+		#foreach ($vm in $vms)
+		<div class="well">
+			<img width="24px" height="24px" src="server.png"  style="display: inline; vertical-align: bottom;" alt="Virtual machine"></a>
+			<ul class="list-inline" style="display: inline; padding-left: 10px;">
+			#foreach ($q in $vm.getQueries())
+				<li>$q</li>
+			#end
+			</ul>
+		</div>
 		#end
-		</ol>
 	</div>
 </div>

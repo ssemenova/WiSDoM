@@ -8,7 +8,9 @@ import static spark.Spark.staticFiles;
 import static spark.Spark.webSocket;
 
 import java.text.DecimalFormat;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -164,10 +166,11 @@ public class Server {
 		DecimalFormat df = new DecimalFormat(".###");
 		model.put("numVMs", numVMs);
 		model.put("numQueries", numQueries);
-		model.put("queryDensity", df.format(numQueries / numVMs));
+		model.put("queryDensity", df.format((double)numQueries / (double)numVMs));
+		model.put("vms", getVMsForActions(actions));
 		
 		model.put("sla", session.getSelectedSLA());
-		model.put("cost", CostUtils.getCostForPlan(session.getSelectedSLA().getModel().getWorkloadSpecification(), actions));
+		model.put("cost", df.format((double)CostUtils.getCostForPlan(session.getSelectedSLA().getModel().getWorkloadSpecification(), actions)/10.0));
 		
 		return renderTemplate(model, "doSLEARN.vm");
 	}
@@ -190,6 +193,23 @@ public class Server {
 		}
 
 		return templatesChosen;
+	}
+	
+	private static List<VMModel> getVMsForActions(List<AdvisorAction> actions) {
+		LinkedList<VMModel> toR = new LinkedList<>();
+		
+		for (AdvisorAction a : actions) {
+			if (a instanceof AdvisorActionProvision) {
+				toR.add(new VMModel());
+			}
+			
+			if (a instanceof AdvisorActionAssign) {
+				AdvisorActionAssign assign = (AdvisorActionAssign) a;
+				toR.peekLast().addQuery(assign.getQueryTypeToAssign());
+			}
+		}
+		
+		return toR;
 	}
 
 	/* wise-specific stuff */

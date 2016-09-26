@@ -1,13 +1,21 @@
-<div id="data">
-    <div class="vm" v-for="(value, key) in vms">
-        <p>VM ID: {{ key }}</p>
-        <p>VM state: {{ value.state }}</p>
-        <p>
-            Queries:
-        <ol>
-            <li v-for="q in value.queue">{{q}}</li>
-        </ol>
-        </p>
+<div id="data" class="col-md-10 col-md-offset-1">
+    <div class="vm panel panel-default" v-for="(value, key) in vms">
+        <div class="panel-heading">
+            <span class="bold">VM ID: </span>
+            {{ key }}
+        </div>
+        <div class="panel-body">
+            <p>
+                <span class="bold">VM state: </span>
+                {{ value.state }}
+            </p>
+            <p>
+                <span class="bold">Queries: </span>
+            <ol>
+                <li v-for="q in value.queue">{{q}}</li>
+            </ol>
+            </p>
+        </div>
     </div>
 </div>
 

@@ -38,14 +38,14 @@ public class Server {
 
 		defineDefaults();
 
-		get("/", (req, res) -> renderFirstPage(req));
+		get("/", (req, res) -> renderFirstPage(req, null));
 
 		//data input workflow:
-		post("/sendInitialDataS", (req, res) -> sendInitialDataS(req));
-		post("/sendInitialDataR", (req, res) -> sendInitialDataR(req));
-		post("/sendSLA", (req, res) -> sendSLA(req));
-		post("/sendNumQueries", (req, res) -> sendNumQueries(req)); //for slearn
-		post("/sendSLA2", (req, res) -> sendSLA2(req));
+		post("/sendInitialDataS", (req, res) -> sendInitialDataS(req, null));
+		post("/sendInitialDataR", (req, res) -> sendInitialDataR(req, null));
+		post("/sendSLA", (req, res) -> sendSLA(req, null));
+		post("/sendNumQueries", (req, res) -> sendNumQueries(req, null)); //for slearn
+		post("/sendSLA2", (req, res) -> sendSLA2(req, null));
 
 		exception(Exception.class, (e, req, res) -> {
 			e.printStackTrace();
@@ -55,7 +55,7 @@ public class Server {
 	}
 
 	/* urls */
-	public static String renderFirstPage(spark.Request req) {
+	public static String renderFirstPage(spark.Request req, String error) {
 		Session session = new Session();
 		sessionMap.put(req.session().id(), session);
 
@@ -65,38 +65,51 @@ public class Server {
 		model.put("templates", templates);
 		model.put("latencies", latencies);
 		model.put("desc", templateDesc);
+
+		if (error != null) {
+			model.put("error", "error.vm");
+			model.put("error-message", error);
+		}
 		return renderTemplate(model, "index.vm");
 	}
 
-	public static String sendInitialDataS(spark.Request req) {
-		HashMap model = new HashMap();
+	public static String sendInitialDataS(spark.Request req, String error) {
 		Session session = getSessionFromMap(req);
-		HashMap<Integer, String> templatesChosen = templatesChosen(req.queryParams());
-
 		session.setLearnType("S");
-		model.put("templates", templatesChosen);
-		session.setTemplates(templatesChosen);
-		model.put("next-Step", "chooseSLA.vm");
-
-		return renderTemplate(model, "chooseSLA.vm");
+		return sendInitialData(req, error, session);
 	}
 
-	public static String sendInitialDataR(spark.Request req) {
-		HashMap model = new HashMap();
+	public static String sendInitialDataR(spark.Request req, String error) {
 		Session session = getSessionFromMap(req);
+		session.setLearnType("R");
+		return sendInitialData(req, error, session);
+	}
+
+	public static String sendInitialData(spark.Request req, String error, Session session) {
+		HashMap model = new HashMap();
 		HashMap<Integer, String> templatesChosen = templatesChosen(req.queryParams());
 
-		session.setLearnType("R");
-		model.put("templates", templatesChosen(req.queryParams()));
+		model.put("templates", templatesChosen);
+		if (templatesChosen.isEmpty()) {
+			return renderFirstPage(req, "You must choose at least one template");
+		}
+
 		session.setTemplates(templatesChosen);
 		model.put("next-Step", "chooseSLA.vm");
 
 		return renderTemplate(model, "chooseSLA.vm");
 	}
 
-	public static String sendSLA(spark.Request req) {
+	public static String sendSLA(spark.Request req, String error) {
 		HashMap<String, Object> model = new HashMap<String, Object>();
 		Session session = getSessionFromMap(req);
+
+		if (req.queryParams("type").isEmpty() | req.queryParams("value").isEmpty()) {
+			model.put("next-Step", "chooseSLA.vm");
+			model.put("error", "error.vm");
+			model.put("error-message", "You must choose an SLA value");
+			return renderTemplate(model, "chooseSLA.vm");
+		}
 
 		session.addSLA1(req.queryParams("type"), req.queryParams("value"));
 		model.put("SLAvalue", req.queryParams("value"));
@@ -112,24 +125,36 @@ public class Server {
 		}
 	}
 
-	public static String sendNumQueries(spark.Request req) {
+	public static String sendNumQueries(spark.Request req, String error) {
 		Map<String, Object> model = new HashMap<>();
 		Session session = getSessionFromMap(req);
 		Map<Integer, Integer> queryFreqs = new HashMap<>();
 
+		int empty = 0;
 		for (String s : req.queryParams()) {
 			if (s.startsWith("templatecount-")) {
-				int tID  = Integer.valueOf(s.substring("templatecount-".length()));
-				int freq = Integer.valueOf(req.queryParams(s));
-				queryFreqs.put(tID, freq);
+				if (req.queryParams(s).isEmpty()) {
+					empty++;
+				} else {
+					int tID = Integer.valueOf(s.substring("templatecount-".length()));
+					int freq = Integer.valueOf(req.queryParams(s));
+					queryFreqs.put(tID, freq);
+				}
 			}
 		}
 
-		// TODO: make sure they entered at least some queries of each template?
+		if (empty > 0) {
+			model.put("next-Step", "chooseNumQueries.vm");
+			model.put("error", "error.vm");
+			model.put("error-message", "You must choose a query amount for every template");
+			model.put("templates", session.getTemplates());
+			return renderTemplate(model, "chooseNumQueries.vm");
+		}
+
 		session.setQueryFreqs(queryFreqs);
 		session.recommendSLA();
 		if (session.isSLEARN()) {
-			model.put("next-step", "chooseSLA2.vm");
+			model.put("next-Step", "chooseSLA2.vm");
 			model.put("SLARecs", session.getRecommendations());
 			model.put("originalSLA", session.getOriginalSLA());
 		}
@@ -137,12 +162,12 @@ public class Server {
 		return renderTemplate(model, "chooseSLA2.vm");
 	}
 
-	public static String sendSLA2(spark.Request req) {
+	public static String sendSLA2(spark.Request req, String error) {
 		Map<String, Object> model = new HashMap<String, Object>();
 		Session session = getSessionFromMap(req);
 
 		if (session.isSLEARN()) {
-			model.put("next-step", "doSLEARN.vm");
+			model.put("next-Step", "doSLEARN.vm");
 			if (req.queryParams("slaIdx").equals("original")) {
 				session.setSLAIndex(-1);
 			} else {

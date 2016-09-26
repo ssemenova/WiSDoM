@@ -1,18 +1,22 @@
-<h1>Choose SLA</h1>
 <section id="initialData">
+    <h1>Choose SLA</h1>
     <form>
-        <h2>Choose SLA type</h2>
-            <div class="input-field col s12">
-                <select name="type">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="SLA-choice">SLA Type</label>
+                <select name="type" id="SLA-choice" class="form-control">
                     <option value="average">Average</option>
                     <option value="percentile">Percentile</option>
                     <option value="max">Max</option>
                 </select>
             </div>
 
-        <h2>Choose value</h2>
-        <input type="text" name="value">
+            <fieldset class="form-group">
+                <label for="SLA-value">SLA Value</label>
+                <input type="text" name="value" id="SLA-value">
+            </fieldset>
 
-        <button type="submit" class="btn btn-default" ic-post-to="/sendSLA" ic-target="#step" ic-indicator="#indicator">DO IT!</button>
+            <button type="submit" class="btn btn-primary" ic-post-to="/sendSLA" ic-target="#step" ic-indicator="#indicator">DO IT!</button>
+        </div>
     </form>
 </section>

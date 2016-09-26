@@ -16,12 +16,22 @@
 		
 		#foreach ($vm in $vms)
 		<div class="well">
-			<img width="24px" height="24px" src="server.png"  style="display: inline; vertical-align: bottom;" alt="Virtual machine"></a>
-			<ul class="list-inline" style="display: inline; padding-left: 10px;">
-			#foreach ($q in $vm.getQueries())
-				<li><div class="sphere t$q"></div></li>
-			#end
-			</ul>
+			<div class="row">
+				<div class="col-xs-1">
+                    <img width="24px" height="24px" src="server.png"  style="display: inline; vertical-align: bottom;" alt="Virtual machine"></a>
+				</div>
+				<div class="col-xs-11">
+					<ul class="list-inline" style="display: inline; padding-left: 10px;">
+					#foreach ($q in $vm.getQueries())
+						<li><div class="sphere t$q"
+								 data-toggle="tooltip"
+								 title="Query Template Number= $q, Description= ''">
+							$q
+							</div></li>
+					#end
+					</ul>
+                </div>
+            </div>
 		</div>
 		#end
 	</div>

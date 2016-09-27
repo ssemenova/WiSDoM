@@ -13,10 +13,13 @@
 
             <fieldset class="form-group">
                 <label for="SLA-value">SLA Value</label>
-                <input type="text" name="value" id="SLA-value">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="value" id="SLA-value">
+                    <div class="input-group-addon">seconds + 60s (VM startup time)</div>
+                </div>
             </fieldset>
 
-            <button type="submit" class="btn btn-primary" ic-post-to="/sendSLA" ic-target="#step" ic-indicator="#indicator">DO IT!</button>
+            <button type="submit" class="btn btn-primary" ic-post-to="/sendSLA" ic-target="#step" ic-indicator="#indicator">Submit SLA</button>
         </div>
     </form>
 </section>

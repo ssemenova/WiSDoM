@@ -1,9 +1,6 @@
 package edu.brandeis.rlearn;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import edu.brandeis.wisedb.AdaptiveModelingUtils;
@@ -13,7 +10,19 @@ import edu.brandeis.wisedb.WiSeDBCachedModel;
 import edu.brandeis.wisedb.WiSeDBUtils;
 import edu.brandeis.wisedb.WorkloadSpecification;
 import edu.brandeis.wisedb.aws.VMType;
+import edu.brandeis.wisedb.cost.ModelQuery;
 import edu.brandeis.wisedb.cost.sla.MaxLatencySLA;
+import edu.brandeis.wisedb.cost.ModelSLA;
+import edu.brandeis.wisedb.cost.sla.AverageLatencyModelSLA;
+import edu.brandeis.wisedb.cost.sla.MaxLatencySLA;
+import edu.brandeis.wisedb.cost.sla.PerQuerySLA;
+import edu.brandeis.wisedb.cost.sla.PercentSLA;
+import edu.brandeis.wisedb.scheduler.FirstFitDecreasingGraphSearch;
+import edu.brandeis.wisedb.scheduler.GraphSearcher;
+import edu.brandeis.wisedb.scheduler.PackNGraphSearch;
+import edu.brandeis.wisedb.scheduler.training.CostModelUtil;
+import edu.brandeis.wisedb.scheduler.training.ModelWorkloadGenerator;
+
 
 /**
  * Created by seaurchi on 9/17/16.
@@ -26,10 +35,15 @@ public class Session {
     private String learnType;
     private String SLAtype;
     private int slaIdx;
-  
+    WorkloadSpecification wf;
+    Map<Integer, Map<VMType, Integer>> ios;
+    Map<Integer, Map<VMType, Integer>> latency;
+
+
     private int startLatency;
     private final int penalty = 1; //penalty for initial SLA
     private final int numSLAToRecommend = 3; // num of SLAs to recommend
+    private HashMap<RecommendedSLA, HashMap<String, Integer>> recHeuristicCost;
 
     private static final Map<Integer, Integer> templateToLatency = new HashMap<>();
 
@@ -69,8 +83,8 @@ public class Session {
     }
 
     public void recommendSLA() {
-        Map<Integer, Map<VMType, Integer>> ios = new HashMap<>();
-        Map<Integer, Map<VMType, Integer>> latency = new HashMap<>();
+        ios = new HashMap<>();
+        latency = new HashMap<>();
         
         for (Integer selectedTemplate : templates.keySet()) {
         	// say that every query takes 1 IO
@@ -93,7 +107,7 @@ public class Session {
         	numSteps--;
         }
 
-        WorkloadSpecification wf = new WorkloadSpecification(
+        wf = new WorkloadSpecification(
                 latency,
                 ios,
                 new VMType[] { VMType.T2_SMALL },
@@ -115,7 +129,9 @@ public class Session {
         	recommendations.add(new RecommendedSLA(loosestLatency - (increment * i), models.get(i), cost.get(i)));
         }
         recommendations = minimizeList(recommendations, numSLAToRecommend);
-
+        for (RecommendedSLA recommendation : recommendations) {
+            recHeuristicCost.put(recommendation, generateHeuristicCharts(recommendation));
+        }
     }
     
     public RecommendedSLA getOriginalSLA() {
@@ -169,6 +185,62 @@ public class Session {
 	public void setQueryFreqs(Map<Integer, Integer> queryFreqs) {
 		this.queryFreqs = queryFreqs;
 	}
+
+	public HashMap<String, Integer> generateHeuristicCharts(RecommendedSLA SLA) {
+	    if (recHeuristicCost.containsKey(SLA)) {
+	        return recHeuristicCost.get(SLA);
+        } else {
+            HashMap<String, Integer> costs = new HashMap<>();
+
+            VMType[] types = new VMType[]{VMType.T2_SMALL};
+
+            if (SLAtype.equals("average")) {
+                ModelSLA slas = new ModelSLA() {
+                    new AverageLatencyModelSLA(startLatency, penalty)
+                };
+            } else if (SLAtype.equals("percentile")) {
+
+            } else if (SLAtype.equals("max")) {
+
+            }
+
+            ModelSLA[] slas = new ModelSLA[]{
+//                    new PerQuerySLA(latency, penalty),
+                    new AverageLatencyModelSLA(startLatency, penalty),
+                    new MaxLatencySLA(startLatency, penalty),
+//                    PercentSLA.nintyTenSLA()
+            };
+
+            WorkloadSpecification[] ws = Arrays.stream(slas)
+                    .map(sla -> new WorkloadSpecification(types, sla))
+                    .toArray(i -> new WorkloadSpecification[i]);
+
+
+            // difference from paper: use 2000 instead of 5000 queries for faster scheduling
+            Set<ModelQuery> workload = ModelWorkloadGenerator.randomQueries(2000, 42, ws[0].getQueryTimePredictor().QUERY_TYPES);
+
+            System.out.println("Created sample workload");
+
+            // get all costs
+            int[] ffd = new int[slas.length];
+            int[] ffi = new int[slas.length];
+            int[] pack9 = new int[slas.length];
+            int[] dt = new int[slas.length];
+
+            for (int i = 0; i < slas.length; i++) {
+                GraphSearcher ffdSearch = new FirstFitDecreasingGraphSearch(ws[i].getSLA(), ws[i].getQueryTimePredictor());
+                GraphSearcher ffiSearch = new FirstFitDecreasingGraphSearch(ws[i].getSLA(), ws[i].getQueryTimePredictor(), true);
+                GraphSearcher pack9search = new PackNGraphSearch(9, ws[i].getQueryTimePredictor(), ws[i].getSLA());
+
+                ffd[i] = CostModelUtil.getCostForPlan(ffdSearch.schedule(workload), ws[i].getSLA());
+                ffi[i] = CostModelUtil.getCostForPlan(ffiSearch.schedule(workload), ws[i].getSLA());
+                pack9[i] = CostModelUtil.getCostForPlan(pack9search.schedule(workload), ws[i].getSLA());
+            }
+            recHeuristicCost.put(SLA, costs);
+            return costs;
+        }
+
+    }
 
 
 }

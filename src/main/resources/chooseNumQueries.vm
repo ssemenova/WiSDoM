@@ -7,6 +7,6 @@
                 <input id="$template" name="templatecount-$template" type="value" class="toggle">
             </div>
         #end
-        <button type="submit" class="btn btn-primary" ic-post-to="/sendNumQueries" ic-target="#step" ic-indicator="#indicator">DO IT!</button>
+        <button type="submit" class="btn btn-primary" ic-post-to="/sendNumQueries" ic-target="#step" ic-indicator="#indicator">Submit Query Numbers</button>
     </form>
 </section>

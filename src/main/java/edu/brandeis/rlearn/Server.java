@@ -43,7 +43,7 @@ public class Server {
 		//data input workflow:
 		post("/sendInitialDataS", (req, res) -> sendInitialDataS(req, null));
 		post("/sendInitialDataR", (req, res) -> sendInitialDataR(req, null));
-		post("/sendSLA", (req, res) -> sendSLA(req, null));
+		post("/sendSLA", (req, res) -> getCostsendSLA(req, null));
 		post("/sendNumQueries", (req, res) -> sendNumQueries(req, null)); //for slearn
 		post("/sendSLA2", (req, res) -> sendSLA2(req, null));
 
@@ -100,7 +100,7 @@ public class Server {
 		return renderTemplate(model, "chooseSLA.vm");
 	}
 
-	public static String sendSLA(spark.Request req, String error) {
+	public static String getCostsendSLA(spark.Request req, String error) {
 		HashMap<String, Object> model = new HashMap<String, Object>();
 		Session session = getSessionFromMap(req);
 
@@ -196,7 +196,8 @@ public class Server {
 		
 		model.put("sla", session.getSelectedSLA());
 		model.put("cost", df.format((double)CostUtils.getCostForPlan(session.getSelectedSLA().getModel().getWorkloadSpecification(), actions)/10.0));
-		
+		model.put("Heuristics", session.generateHeuristicCharts(session.getSelectedSLA()));
+
 		return renderTemplate(model, "doSLEARN.vm");
 	}
 

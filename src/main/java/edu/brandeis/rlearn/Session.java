@@ -1,6 +1,12 @@
 package edu.brandeis.rlearn;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import edu.brandeis.wisedb.AdaptiveModelingUtils;
@@ -12,16 +18,10 @@ import edu.brandeis.wisedb.WorkloadSpecification;
 import edu.brandeis.wisedb.aws.VMType;
 import edu.brandeis.wisedb.cost.ModelQuery;
 import edu.brandeis.wisedb.cost.sla.MaxLatencySLA;
-import edu.brandeis.wisedb.cost.ModelSLA;
-import edu.brandeis.wisedb.cost.sla.AverageLatencyModelSLA;
-import edu.brandeis.wisedb.cost.sla.MaxLatencySLA;
-import edu.brandeis.wisedb.cost.sla.PerQuerySLA;
-import edu.brandeis.wisedb.cost.sla.PercentSLA;
 import edu.brandeis.wisedb.scheduler.FirstFitDecreasingGraphSearch;
 import edu.brandeis.wisedb.scheduler.GraphSearcher;
 import edu.brandeis.wisedb.scheduler.PackNGraphSearch;
 import edu.brandeis.wisedb.scheduler.training.CostModelUtil;
-import edu.brandeis.wisedb.scheduler.training.ModelWorkloadGenerator;
 
 
 /**
@@ -43,7 +43,7 @@ public class Session {
     private int startLatency;
     private final int penalty = 1; //penalty for initial SLA
     private final int numSLAToRecommend = 3; // num of SLAs to recommend
-    private HashMap<RecommendedSLA, HashMap<String, Integer>> recHeuristicCost;
+    private Map<RecommendedSLA, Map<String, Integer>> recHeuristicCost;
 
     private static final Map<Integer, Integer> templateToLatency = new HashMap<>();
 
@@ -186,57 +186,38 @@ public class Session {
 		this.queryFreqs = queryFreqs;
 	}
 
-	public HashMap<String, Integer> generateHeuristicCharts(RecommendedSLA SLA) {
+	public Map<String, Integer> generateHeuristicCharts(RecommendedSLA SLA) {
 	    if (recHeuristicCost.containsKey(SLA)) {
 	        return recHeuristicCost.get(SLA);
         } else {
             HashMap<String, Integer> costs = new HashMap<>();
 
-            VMType[] types = new VMType[]{VMType.T2_SMALL};
-
-            if (SLAtype.equals("average")) {
-                ModelSLA slas = new ModelSLA() {
-                    new AverageLatencyModelSLA(startLatency, penalty)
-                };
-            } else if (SLAtype.equals("percentile")) {
-
-            } else if (SLAtype.equals("max")) {
-
+            Set<ModelQuery> workload = new HashSet<>();
+            // difference from paper: use 2000 instead of 5000 queries for faster schedModelQuery        
+            for (Entry<Integer, Integer> e : queryFreqs.entrySet()) {
+            	for (int i = 0; i < e.getValue(); i++)
+            		workload.add(new ModelQuery(e.getKey()));
             }
-
-            ModelSLA[] slas = new ModelSLA[]{
-//                    new PerQuerySLA(latency, penalty),
-                    new AverageLatencyModelSLA(startLatency, penalty),
-                    new MaxLatencySLA(startLatency, penalty),
-//                    PercentSLA.nintyTenSLA()
-            };
-
-            WorkloadSpecification[] ws = Arrays.stream(slas)
-                    .map(sla -> new WorkloadSpecification(types, sla))
-                    .toArray(i -> new WorkloadSpecification[i]);
-
-
-            // difference from paper: use 2000 instead of 5000 queries for faster scheduling
-            Set<ModelQuery> workload = ModelWorkloadGenerator.randomQueries(2000, 42, ws[0].getQueryTimePredictor().QUERY_TYPES);
+            
 
             System.out.println("Created sample workload");
 
-            // get all costs
-            int[] ffd = new int[slas.length];
-            int[] ffi = new int[slas.length];
-            int[] pack9 = new int[slas.length];
-            int[] dt = new int[slas.length];
+            int ffd, ffi, pack9;
 
-            for (int i = 0; i < slas.length; i++) {
-                GraphSearcher ffdSearch = new FirstFitDecreasingGraphSearch(ws[i].getSLA(), ws[i].getQueryTimePredictor());
-                GraphSearcher ffiSearch = new FirstFitDecreasingGraphSearch(ws[i].getSLA(), ws[i].getQueryTimePredictor(), true);
-                GraphSearcher pack9search = new PackNGraphSearch(9, ws[i].getQueryTimePredictor(), ws[i].getSLA());
+            GraphSearcher ffdSearch = new FirstFitDecreasingGraphSearch(wf.getSLA(), wf.getQueryTimePredictor());
+            GraphSearcher ffiSearch = new FirstFitDecreasingGraphSearch(wf.getSLA(), wf.getQueryTimePredictor(), true);
+            GraphSearcher pack9search = new PackNGraphSearch(9, wf.getQueryTimePredictor(), wf.getSLA());
 
-                ffd[i] = CostModelUtil.getCostForPlan(ffdSearch.schedule(workload), ws[i].getSLA());
-                ffi[i] = CostModelUtil.getCostForPlan(ffiSearch.schedule(workload), ws[i].getSLA());
-                pack9[i] = CostModelUtil.getCostForPlan(pack9search.schedule(workload), ws[i].getSLA());
-            }
-            recHeuristicCost.put(SLA, costs);
+            ffd = CostModelUtil.getCostForPlan(ffdSearch.schedule(workload), wf.getSLA());
+            ffi = CostModelUtil.getCostForPlan(ffiSearch.schedule(workload), wf.getSLA());
+            pack9 = CostModelUtil.getCostForPlan(pack9search.schedule(workload), wf.getSLA());
+
+            Map<String, Integer> hCosts = new HashMap<>();
+            hCosts.put("ffd", ffd);
+            hCosts.put("ffi", ffi);
+            hCosts.put("pack9", pack9);
+            recHeuristicCost.put(SLA, hCosts);
+            
             return costs;
         }
 

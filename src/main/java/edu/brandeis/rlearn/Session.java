@@ -214,6 +214,7 @@ public class Session {
             hCosts.put("ffd", ffd);
             hCosts.put("ffi", ffi);
             hCosts.put("pack9", pack9);
+            hCosts.put("wisedb", (int)(CostUtils.getCostForPlan(getSelectedSLA().getModel().getWorkloadSpecification(), doPlacementWithSelected())/10.0));
             recHeuristicCost.put(SLA, hCosts);
             
             return costs;

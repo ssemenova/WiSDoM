@@ -59,6 +59,7 @@ public class Session {
 
     public Session() {
         templates = new HashMap<>();
+        recHeuristicCost = new HashMap<>();
     }
 
     public void setTemplates(HashMap<Integer, String> templates) {
@@ -129,9 +130,6 @@ public class Session {
         	recommendations.add(new RecommendedSLA(loosestLatency - (increment * i), models.get(i), cost.get(i)));
         }
         recommendations = minimizeList(recommendations, numSLAToRecommend);
-        for (RecommendedSLA recommendation : recommendations) {
-            recHeuristicCost.put(recommendation, generateHeuristicCharts(recommendation));
-        }
     }
     
     public RecommendedSLA getOriginalSLA() {

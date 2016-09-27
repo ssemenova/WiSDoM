@@ -1,13 +1,17 @@
 function createChart() {
     var ctx = $("#chart");
+    var ffi = ctx.data("ffi");
+    var ffd = ctx.data("ffd");
+    var pack9 = ctx.data("pack9");
+    var wisedb = ctx.data("wisedb");
 
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+            labels: ["ffd", "ffi", "pack9", "wiseDB"],
             datasets: [{
                 label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
+                data: [ffi, ffd, pack9, wiseDB],
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',

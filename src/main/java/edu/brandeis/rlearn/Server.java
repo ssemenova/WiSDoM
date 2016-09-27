@@ -195,9 +195,16 @@ public class Server {
 		model.put("vms", getVMsForActions(actions));
 		
 		model.put("sla", session.getSelectedSLA());
+		int ffi = 1;
+		int ffd = 2;
+		int pack9 = 3;
+		int wisedb = 4;
 		model.put("cost", df.format((double)CostUtils.getCostForPlan(session.getSelectedSLA().getModel().getWorkloadSpecification(), actions)/10.0));
-		model.put("Heuristics", session.generateHeuristicCharts(session.getSelectedSLA()));
-
+		model.put("ffi", ffi);
+		model.put("ffd", ffd);
+		model.put("pack9", pack9);
+		model.put("wisedb", wisedb);
+//session.generateHeuristicCharts(session.getSelectedSLA())
 		return renderTemplate(model, "doSLEARN.vm");
 	}
 

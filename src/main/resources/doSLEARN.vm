@@ -1,5 +1,5 @@
 <div class="panel panel-default">
-	<div class="panel-heading strat" data="$Heuristics">Recommended Strategy</div>
+	<div class="panel-heading strat">Recommended Strategy</div>
 	<div class="panel-body">
 		<dl class="dl-horizontal">
 		  <dt>Number of VMs</dt>
@@ -36,7 +36,7 @@
 		#end
         <div class="row">
             <div class="col-xs-12">
-                <canvas id="chart" width="400" height="400"></canvas>
+                <canvas id="chart" width="400" height="400" data-ffi="$ffi" data-ffd="$ffd" data-pack9="$pack9" data-wisedb="$wisedb"></canvas>
             </div>
         </div>
 	</div>

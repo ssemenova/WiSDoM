@@ -1,0 +1,17 @@
+<div class="panel panel-default" id="learning_type">
+  <div class="panel-heading">
+    <h3 class="panel-title">Learning type</h3>
+  </div>
+  <div class="panel-body">
+    <form>
+      <div v-for="t in templates" class="form-group">
+	<input v-bind:id="t.id"
+               v-bind:name="t.id"
+               type="checkbox"
+               class="toggle">
+	<label v-bind:for="t.id">{{t.name}}</label>
+	<p>{{t.disc}}</p>
+      </div>
+    </form>
+  </div>
+</div>

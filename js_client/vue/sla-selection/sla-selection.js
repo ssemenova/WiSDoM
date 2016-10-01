@@ -1,9 +1,10 @@
 const axios = require("axios");
 const Plotly = require("plotly.js/lib/core");
+const slider = require("./slider.vue");
 
 Plotly.register([
     require('plotly.js/lib/bar')
- ]);
+]);
 
 
 const _ = {
@@ -14,10 +15,17 @@ const _ = {
 
 
 module.exports = {
+    components: {
+        slider
+    },
+    
     data: function () {
         return {
             groups: [],
-            latencies: []
+            latencies: [],
+            deadline: 150,
+            minValue: 50,
+            maxValue: 150
         };
     },
 
@@ -28,12 +36,29 @@ module.exports = {
                 .then(r => {
                     this.latencies = r.data;
                 });
-        }
-    },
+        },
 
-    watch: {
-        templates: function(newTemplates) {
-            const templateIDs = newTemplates
+        updateSLA: function(value) {
+            this.deadline = value;
+
+            const plt = document.getElementById("slaPlot");
+            try {
+                Plotly.deleteTraces(plt, 1);
+
+                const x = ["Longest query",
+                           "Shortest query",
+                           "All queries"];
+                const y = [value, value, value];
+                
+                Plotly.addTraces(plt,
+                                 [{x, y, type: "scatter", name: "SLA"}]);
+            } catch (e) {
+                // eat any errors (pre-init)
+            }
+        },
+
+        redrawGraph: function () {
+            const templateIDs = this.templates
                       .map((itm, idx) => (itm != null) && idx)
                       .filter(itm => itm != null);
 
@@ -52,6 +77,11 @@ module.exports = {
             y[1] = _.min(ourLatencies)/1000;
             y[2] = _.sum(ourLatencies)/1000;
 
+            this.minValue = y[0] + 5; // set the minimum slider value
+            this.maxValue = y[2] * 2; // set the maximum slider value
+
+            console.log("setting max to " + this.maxValue);
+            
             const layout = {
                 yaxis: {
                     showgrid: true,
@@ -59,17 +89,22 @@ module.exports = {
                 }
             };
 
-            const y2 = [100, 100, 100];
-            
+            const y2 = [this.deadline, this.deadline, this.deadline];
+            Plotly.purge("slaPlot");
             Plotly.newPlot("slaPlot",
-                           [{x, y, type: "bar"},
-                            {x, y: y2, type: "scatter"}],
+                           [{x, y, type: "bar", name: "Queries"},
+                            {x, y: y2, type: "scatter", name: "SLA"}],
                            layout, {displayModeBar: false});
+        }
+    },
+
+    watch: {
+        templates: function(newTemplates) {
+            this.redrawGraph();
         }
     },
 
     created: function () {
         this.getLatencyInfo();
-    }
-    
+    }    
 };

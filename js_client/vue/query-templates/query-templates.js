@@ -1,4 +1,5 @@
 const axios = require("axios");
+const deepcopy = require("deepcopy");
 
 module.exports = {
     data: function () {
@@ -19,7 +20,7 @@ module.exports = {
         
         save: function () {
             this.saved = true;
-            this.$emit("templates-changed", this.selected);
+            this.$emit("templates-changed", deepcopy(this.selected));
         },
 
         clear: function() {

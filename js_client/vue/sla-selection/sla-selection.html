@@ -3,10 +3,16 @@
     <h3 class="panel-title">SLA Selection</h3>
   </div>
   <div class="panel-body">
-    <div class="container">
-      <div class="row">
-        <div class="col-sm-6" id="slaPlot"></div>
-        <div class="col-sm-6">{{ templates }}</div>
+    <div class="row">
+      <div class="col-sm-6" id="slaPlot"></div>
+      <div class="col-sm-6">
+        <div id="slider">
+          <slider :min-value="minValue"
+                  :max-value="maxValue"
+                  max-value="100"
+                  v-on:value-changed="updateSLA">
+          </slider>
+        </div>
       </div>
     </div>
   </div>

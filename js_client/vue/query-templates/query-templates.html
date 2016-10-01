@@ -1,0 +1,22 @@
+<div class="panel panel-default" id="learning_type">
+  <div class="panel-heading">
+    <h3 class="panel-title" v-show="!saved">Query selection</h3>
+    <h3 class="panel-title" v-show="saved" v-on:click="clear()">{{ countSelected() }} queries selected (click to change)</h3>
+  </div>
+  <div v-show="!saved" class="panel-body">
+    <div v-for="t in templates" class="form-group">
+      <input v-bind:id="t.id"
+             v-bind:name="t.id"
+             v-model="queries[t.id]"
+             type="checkbox"
+             class="toggle">
+      <label v-bind:for="t.id">{{t.name}}</label>
+      <p>{{t.desc}}</p>
+    </div>
+    
+    <button v-on:click="save()"
+            class="btn btn-primary">
+      Save
+    </button>
+  </div>
+</div>

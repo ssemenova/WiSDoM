@@ -16,12 +16,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
+
 import edu.brandeis.wisedb.AdvisorAction;
 import edu.brandeis.wisedb.AdvisorActionAssign;
 import edu.brandeis.wisedb.AdvisorActionProvision;
 import edu.brandeis.wisedb.CostUtils;
 import edu.brandeis.wisedb.aws.VMType;
 import spark.ModelAndView;
+import spark.Request;
+import spark.Response;
 import spark.template.velocity.VelocityTemplateEngine;
 
 public class Server {
@@ -34,7 +39,7 @@ public class Server {
 
 	public static void main(String[] args) {
 		webSocket("/bandit", BanditWebSocket.class);
-		staticFiles.location("/assets");
+		staticFiles.externalLocation(System.getenv("js_client"));
 
 		defineDefaults();
 
@@ -47,11 +52,30 @@ public class Server {
 		post("/sendNumQueries", (req, res) -> sendNumQueries(req, null)); //for slearn
 		post("/sendSLA2", (req, res) -> sendSLA2(req, null));
 
+		
+		get("/querytemplates", Server::sendQueryTemplateInfo);
+		
 		exception(Exception.class, (e, req, res) -> {
 			e.printStackTrace();
 		});
 
 		init();
+	}
+	
+	public static Object sendQueryTemplateInfo(Request req, Response res) {
+		JsonArray toR = Json.array().asArray();
+		for (Integer t : templates.keySet()) {
+			toR.add(Json.object()
+					.add("id", t)
+					.add("name", templates.get(t))
+					.add("desc", templateDesc.get(t)));
+							
+		}
+		
+		res.type("application/json");
+		
+		return toR.toString();
+		
 	}
 
 	/* urls */

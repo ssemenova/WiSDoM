@@ -1,18 +1,19 @@
 <div class="panel panel-default" id="learning_type">
   <div class="panel-heading">
-    <h3 class="panel-title">Learning type</h3>
+    <h3 class="panel-title" v-show="!isModeSet()">Learning type</h3>
+    <h3 class="panel-title" v-show="isModeSet()" v-on:click="clearMode()">Learning type: {{mode}} (click to change)</h3>
   </div>
-  <div class="panel-body">
+  <div class="panel-body" v-show="!isModeSet()">
     <form>
       <div class="radio">
         <label>
-          <input type="radio" name="type-radio" value="slearn" checked>
+          <input type="radio" name="type-radio" value="slearn" v-model="mode">
           <strong>Supervised learning</strong>: WiSeDB can generate <em>decision tree models</em> tailored to a specific application's workload. This supports <em>SLA recommendation</em> and <em>batch scheduling</em>.
         </label>
       </div>
       <div class="radio">
         <label class="radio">
-          <input type="radio" name="type-radio" value="rlearn">
+          <input type="radio" name="type-radio" value="rlearn" v-model="mode">
           <strong>Reinforcment learning</strong>: WiSeDB can use a tiered network of <em>contextual multi-armed bandits</em> for <em>online processing</em> of queries that <em>responds to changes on the fly</em>.
         </label>
       </div>

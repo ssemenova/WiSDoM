@@ -8,6 +8,7 @@ import static spark.Spark.staticFiles;
 import static spark.Spark.webSocket;
 
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
 
 import edu.brandeis.wisedb.AdvisorAction;
 import edu.brandeis.wisedb.AdvisorActionAssign;
@@ -54,6 +56,7 @@ public class Server {
 
 		
 		get("/querytemplates", Server::sendQueryTemplateInfo);
+		get("/querylatency", Server::sendQueryLatencyInfo);
 		
 		exception(Exception.class, (e, req, res) -> {
 			e.printStackTrace();
@@ -76,6 +79,18 @@ public class Server {
 		
 		return toR.toString();
 		
+	}
+	
+	public static Object sendQueryLatencyInfo(Request req, Response res) {
+		JsonObject toR = Json.object();
+		
+		for (Integer i : templates.keySet()) {
+			toR.add(String.valueOf(i), latencies.get(i).get(VMType.T2_SMALL));
+		}
+		
+		res.type("application/json");
+		
+		return toR.toString();
 	}
 
 	/* urls */

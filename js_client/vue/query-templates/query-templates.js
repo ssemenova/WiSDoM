@@ -4,7 +4,7 @@ module.exports = {
     data: function () {
         return {
             templates: [],
-            queries: [],
+            selected: [],
             saved: false
         };
     },
@@ -19,6 +19,7 @@ module.exports = {
         
         save: function () {
             this.saved = true;
+            this.$emit("templates-changed", this.selected);
         },
 
         clear: function() {
@@ -26,7 +27,7 @@ module.exports = {
         },
 
         countSelected: function () {
-            return this.queries
+            return this.selected
                 .filter(x => x != null)
                 .length;
         }

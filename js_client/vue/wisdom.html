@@ -5,13 +5,14 @@
     </div>
 
     <div class="col-md-6">
-      <query-templates></query-templates>
+      <query-templates v-on:templates-changed="templatesChanged">
+      </query-templates>
     </div>
   </div>
 
   <div class="row">
     <div class="col-md-6">
-      <sla-selection></sla-selection>
+      <sla-selection :templates="templates"></sla-selection>
     </div>
 
     <div class="col-md-6">

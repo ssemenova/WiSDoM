@@ -7,7 +7,7 @@
     <div v-for="t in templates" class="form-group">
       <input v-bind:id="t.id"
              v-bind:name="t.id"
-             v-model="queries[t.id]"
+             v-model="selected[t.id]"
              type="checkbox"
              class="toggle">
       <label v-bind:for="t.id">{{t.name}}</label>

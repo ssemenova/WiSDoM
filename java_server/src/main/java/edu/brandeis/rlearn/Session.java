@@ -45,7 +45,7 @@ public class Session {
     private final int numSLAToRecommend = 3; // num of SLAs to recommend
     private Map<RecommendedSLA, Map<String, Integer>> recHeuristicCost;
 
-    private static final Map<Integer, Integer> templateToLatency = new HashMap<>();
+    public static final Map<Integer, Integer> templateToLatency = new HashMap<>();
 
     
     static {
@@ -54,6 +54,7 @@ public class Session {
     	templateToLatency.put(3, 4000);
     	templateToLatency.put(4, 5200);
     	templateToLatency.put(5, 8000);
+    	WiSeDBUtils.setThreadCountForTraining(8);
 
     }
 

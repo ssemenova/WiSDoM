@@ -26,7 +26,7 @@ module.exports = {
 
         getFreqs: function() {
             return this.frequencies
-                .filter((itm, idx) => this.templates.indexOf(idx) != 0);
+                .filter((itm, idx) => this.templates.indexOf(idx) > -1);
         },
 
         save: function () {

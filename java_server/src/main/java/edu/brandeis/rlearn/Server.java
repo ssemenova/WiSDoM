@@ -37,8 +37,6 @@ public class Server {
 
 	private static HashMap<String, Session> sessionMap = new HashMap<>();
 	private static HashMap<Integer, String> templates = new HashMap<>();
-	private static Map<Integer, Map<VMType, Integer>> latencies = new HashMap<>();
-	private static Map<VMType, Integer> forMachine = new HashMap<>();
 	private static Map<Integer, String> templateDesc = new HashMap<>();
 	private static AtomicInteger sessionIDCounter = new AtomicInteger(1);
 
@@ -78,6 +76,7 @@ public class Server {
 		JsonArray templates = data.get("templates").asArray();
 		JsonArray freqs = data.get("frequencies").asArray();
 		int deadline = (int) data.get("deadline").asDouble();
+		deadline += 60;
 		deadline *= 1000; // convert from seconds to milis
 		
 		
@@ -133,8 +132,8 @@ public class Server {
 	public static Object sendQueryLatencyInfo(Request req, Response res) {
 		JsonObject toR = Json.object();
 
-		for (Integer i : templates.keySet()) {
-			toR.add(String.valueOf(i), latencies.get(i).get(VMType.T2_SMALL));
+		for (Integer i : Session.templateToLatency.keySet()) {
+			toR.add(String.valueOf(i), Session.templateToLatency.get(i));
 		}
 
 		res.type("application/json");
@@ -151,7 +150,6 @@ public class Server {
 		model.put("next-Step", "initialForm.vm");
 
 		model.put("templates", templates);
-		model.put("latencies", latencies);
 		model.put("desc", templateDesc);
 
 		if (error != null) {
@@ -328,25 +326,6 @@ public class Server {
 
 	/* wise-specific stuff */
 	public static void defineDefaults() {
-		forMachine.put(VMType.T2_SMALL, 20000);
-		latencies.put(1, forMachine);
-
-		forMachine = new HashMap<>();
-		forMachine.put(VMType.T2_SMALL, 30000);
-		latencies.put(2, forMachine);
-
-		forMachine = new HashMap<>();
-		forMachine.put(VMType.T2_SMALL, 40000);
-		latencies.put(3, forMachine);
-
-		forMachine = new HashMap<>();
-		forMachine.put(VMType.T2_SMALL, 52000);
-		latencies.put(4, forMachine);
-
-		forMachine = new HashMap<>();
-		forMachine.put(VMType.T2_SMALL, 80000);
-		latencies.put(5, forMachine);
-
 		templates.put(1, "SQL QUERY 1");
 		templates.put(2, "SQL QUERY 2");
 		templates.put(3, "SQL QUERY 3");

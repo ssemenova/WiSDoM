@@ -24,10 +24,15 @@ module.exports = {
             this.$emit("mode-changed", false);
         },
 
+        getFreqs: function() {
+            return this.frequencies
+                .filter((itm, idx) => this.templates.indexOf(idx) != 0);
+        },
+
         save: function () {
             this.saved = true;
             this.$emit("mode-changed", this.mode); // slearn
-            this.$emit("frequency-changed", this.frequencies);
+            this.$emit("frequency-changed", this.getFreqs());
         },
 
         haveTemplates: function() {

@@ -7,6 +7,7 @@ module.exports = {
     data: function () {
         return {
             templates: [],
+            frequencies: [],
             mode: false,
             deadline: false
         };
@@ -27,6 +28,10 @@ module.exports = {
 
         deadlineChanged: function(d) {
             this.deadline = d;
+        },
+
+        frequenciesChanged: function(f) {
+            this.frequencies = f;
         }
     }
 

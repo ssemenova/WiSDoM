@@ -9,6 +9,7 @@ import static spark.Spark.webSocket;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import java.util.stream.StreamSupport;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 
 import edu.brandeis.wisedb.AdvisorAction;
 import edu.brandeis.wisedb.AdvisorActionAssign;
@@ -70,26 +72,41 @@ public class Server {
 	public static Object sendSLARecommendations(Request req, Response res) {
 		JsonArray toR = Json.array().asArray();
 
-		JsonArray templates = Json.parse(req.queryParams("templates")).asArray();
-		int deadline = Integer.valueOf(req.queryParams("deadline"));
-
+		System.out.println(req.body());
+		JsonObject data = Json.parse(req.body()).asObject();
+		
+		JsonArray templates = data.get("templates").asArray();
+		JsonArray freqs = data.get("frequencies").asArray();
+		int deadline = (int) data.get("deadline").asDouble();
+		deadline *= 1000; // convert from seconds to milis
+		
+		
 		Session s = new Session();
 		sessionMap.put(String.valueOf(sessionIDCounter.getAndIncrement()), s);
-		Set<Integer> selected = StreamSupport.stream(templates.spliterator(), false)
+		List<Integer> selected = StreamSupport.stream(templates.spliterator(), false)
 				.map(v -> v.asInt())
-				.collect(Collectors.toSet());
+				.collect(Collectors.toList());
 		
-		s.setTemplates(selected);
+		int idx = 0;
+		Map<Integer, Integer> frequencies = new HashMap<>();
+		for (Integer i : selected) {
+			frequencies.put(i, freqs.get(idx).asInt());
+			idx++;
+		}
+		
+		s.setQueryFreqs(frequencies);
+		s.setTemplates(new HashSet<>(selected));
 		s.setLearnType("S");
 		s.addSLA1("deadline", deadline);
 		
 		s.recommendSLA();
-		int idx = 0;
+		idx = 0;
 		for (RecommendedSLA sla : s.getRecommendations()) {
 			toR.add(Json.object()
 					.add("index", idx)
 					.add("cost", sla.getCostCents())
 					.add("deadline", sla.getDeadlineSeconds()));
+			idx++;
 		}
 
 

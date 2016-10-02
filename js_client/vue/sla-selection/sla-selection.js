@@ -44,7 +44,7 @@ module.exports = {
         },
 
         save: function () {
-            this.$emit("deadline-changed", this.deadline);
+            this.$emit("deadline-changed", parseFloat(this.deadline));
             this.saved = true;
         },
 

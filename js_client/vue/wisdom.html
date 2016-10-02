@@ -14,12 +14,14 @@
   <div class="row">
     <div class="col-md-6">
       <learning-type :templates="templates"
-                     v-on:mode-changed="modeChanged">
+                     v-on:mode-changed="modeChanged"
+                     v-on:frequency-changed="frequenciesChanged">
       </learning-type>
     </div>
     
     <div class="col-md-6">
       <sla-recs :templates="templates"
+                :frequencies="frequencies"
                 :mode="mode"
                 :sla="deadline">
       </sla-recs>

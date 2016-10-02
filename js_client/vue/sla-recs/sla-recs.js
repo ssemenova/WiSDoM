@@ -7,7 +7,7 @@ module.exports = {
         };
     },
 
-    props: ["mode", "templates", "sla"],
+    props: ["mode", "templates", "frequencies", "sla"],
 
     computed: {
         correctMode: function () {
@@ -41,6 +41,15 @@ module.exports = {
             if (!newVal)
                 return;
 
+            console.log("sending request! deadline: " + this.sla);
+            // we are now in the correct mode. send the request...
+            axios.post("/slarecs",
+                       { "templates": this.templates,
+                         "deadline": this.sla,
+                         "frequencies": this.frequencies })
+                .then(res => {
+                    console.log(res);
+                });
             
         }
     }

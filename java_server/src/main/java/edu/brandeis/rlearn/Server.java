@@ -68,7 +68,7 @@ public class Server {
 	}
 
 	public static Object sendSLARecommendations(Request req, Response res) {
-		JsonArray toR = Json.array().asArray();
+		JsonArray suggestions = Json.array().asArray();
 
 		System.out.println(req.body());
 		JsonObject data = Json.parse(req.body()).asObject();
@@ -81,7 +81,8 @@ public class Server {
 		
 		
 		Session s = new Session();
-		sessionMap.put(String.valueOf(sessionIDCounter.getAndIncrement()), s);
+		String sessionID = String.valueOf(sessionIDCounter.getAndIncrement()); 
+		sessionMap.put(sessionID, s);
 		List<Integer> selected = StreamSupport.stream(templates.spliterator(), false)
 				.map(v -> v.asInt())
 				.collect(Collectors.toList());
@@ -101,14 +102,20 @@ public class Server {
 		s.recommendSLA();
 		idx = 0;
 		for (RecommendedSLA sla : s.getRecommendations()) {
-			toR.add(Json.object()
+			suggestions.add(Json.object()
 					.add("index", idx)
 					.add("cost", sla.getCostCents())
 					.add("deadline", sla.getDeadlineSeconds()));
 			idx++;
 		}
 
-
+		JsonObject toR = Json.object();
+		toR.add("suggestions", suggestions);
+		toR.add("sessionID", sessionID);
+		toR.add("original", Json.object()
+				.add("cost", s.getOriginalSLA().getCostCents())
+				.add("deadline", s.getOriginalSLA().getDeadlineSeconds()));
+		
 		res.type("application/json");
 		return toR.toString();
 	}

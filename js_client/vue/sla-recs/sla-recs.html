@@ -9,7 +9,26 @@
     </div>
 
     <div v-show="!waiting">
-
+      <p>Select an SLA from below.</p>
     </div>
   </div>
+  <table class="table" v-if="!waiting && correctMode && results">
+    <thead>
+      <tr><th>#</th><th>Deadline</th><th>Cost</th><th>Select</th></tr>            
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>{{ results.original.deadline }} seconds</td>
+        <td>{{ results.original.cost }} cents</td>
+        <td><button class="btn btn-primary" v-on:click="selectSLA(-1)">Use Original SLA</button>
+      </tr>
+      <tr v-for="r in results.suggestions">
+        <td>{{ r.index + 2}}</td>
+        <td>{{ r.deadline }} seconds</td>
+        <td>{{ r.cost }} cents</td>
+        <td><button class="btn btn-default" v-on:click="selectSLA(r.index)">Use Suggested SLA</button></td>
+      </tr>
+    </tbody>
+  </table>
 </div>

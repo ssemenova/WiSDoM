@@ -3,7 +3,8 @@ const axios = require("axios");
 module.exports = {
     data: function () {
         return {
-            waiting: true
+            waiting: true,
+            results: false
         };
     },
 
@@ -48,7 +49,8 @@ module.exports = {
                          "deadline": this.sla,
                          "frequencies": this.frequencies })
                 .then(res => {
-                    console.log(res);
+                    this.waiting = false;
+                    this.results = res.data;
                 });
             
         }

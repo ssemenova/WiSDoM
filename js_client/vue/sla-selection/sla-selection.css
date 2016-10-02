@@ -1,9 +1,13 @@
-#slaPlot {
-    height: 400px;
+#slaPlot .svg-container {
+    margin: auto;
 }
 
 #slider {
-    width: 290px;
+    width: 400px;
     margin: auto;
     display: block;
+}
+
+#saveBtn {
+    padding-top: 16px;
 }

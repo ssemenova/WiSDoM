@@ -86,7 +86,7 @@
 .noUi-target {
 	background: #FAFAFA;
 	border-radius: 4px;
-	border: 1px solid #D3D3D3;
+	border: 1px solid #A3A3A3;
 	box-shadow: inset 0 1px 1px #F0F0F0, 0 3px 6px -5px #BBB;
 }
 .noUi-connect {
@@ -105,7 +105,7 @@
 	cursor: n-resize;
 }
 .noUi-handle {
-	border: 1px solid #D9D9D9;
+	border: 1px solid #B5B5B5;
 	border-radius: 3px;
 	background: #FFF;
 	cursor: default;
@@ -128,7 +128,7 @@
 	position: absolute;
 	height: 14px;
 	width: 1px;
-	background: #E8E7E6;
+	background: #A8A7A6;
 	left: 14px;
 	top: 6px;
 }
@@ -196,22 +196,20 @@ module.exports = {
     },
 
     watch: {
-        minValue: function(val, oldVal) {
-            console.log("slider is setting min to " + val);
-            this.$el.noUiSlider.updateOptions({
-                range: {
-                    min: parseInt(val),
-                    max: parseInt(this.maxValue)
-                }
-            }, true);
-        },
-
         maxValue: function(val, oldVal) {
-            console.log("slider is setting max to " + val);
             this.$el.noUiSlider.updateOptions({
                 range: {
                     min: parseInt(this.minValue),
                     max: parseInt(val)
+                }
+            }, true);
+        },
+        
+        minValue: function(val, oldVal) {
+            this.$el.noUiSlider.updateOptions({
+                range: {
+                    min: parseInt(val),
+                    max: parseInt(this.maxValue)
                 }
             }, true);
         }

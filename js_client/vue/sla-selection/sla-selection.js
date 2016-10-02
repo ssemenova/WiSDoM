@@ -38,6 +38,12 @@ module.exports = {
                 });
         },
 
+        haveTemplates: function() {
+            return this.templates
+                .map((itm, idx) => (itm != null) && idx)
+                .length != 0;
+        },
+
         updateSLA: function(value) {
             this.deadline = value;
 
@@ -79,10 +85,17 @@ module.exports = {
 
             this.minValue = y[0] + 5; // set the minimum slider value
             this.maxValue = y[2] * 2; // set the maximum slider value
-
-            console.log("setting max to " + this.maxValue);
             
             const layout = {
+                autosize: false,
+                width: 360,
+                height: 300,
+                margin: {
+                    b: 70,
+                    l: 40,
+                    t: 10,
+                    r: 40
+                },
                 yaxis: {
                     showgrid: true,
                     gridcolor: "#bdbdbd"

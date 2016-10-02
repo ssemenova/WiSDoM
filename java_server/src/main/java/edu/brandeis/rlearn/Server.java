@@ -113,6 +113,7 @@ public class Server {
 		toR.add("suggestions", suggestions);
 		toR.add("sessionID", sessionID);
 		toR.add("original", Json.object()
+				.add("index", -1)
 				.add("cost", s.getOriginalSLA().getCostCents())
 				.add("deadline", s.getOriginalSLA().getDeadlineSeconds()));
 		

@@ -20,6 +20,8 @@ module.exports = {
     methods: {
         templatesChanged: function(t) {
             this.templates = t;
+            this.frequencies = false;
+            this.deadline = false;
         },
 
         modeChanged: function(m) {

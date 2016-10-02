@@ -46,6 +46,11 @@ module.exports = {
                 this.$emit("mode-changed", m);
                 this.saved = true;
             }
+        },
+
+        templates: function(t) {
+            this.saved = false;
+            this.$emit("frequency-changed", []);
         }
     }
 };

@@ -4,19 +4,28 @@
     <h3 class="panel-title" v-show="saved" v-on:click="clear()">{{ numSelected() }} queries selected (click to change)</h3>
   </div>
   <div v-show="!saved" class="panel-body">
-    <div v-for="t in templates" class="form-group">
-      <input v-bind:id="t.id"
-             v-bind:name="t.id"
-             v-model="selected[t.id]"
-             type="checkbox"
-             class="toggle">
-      <label v-bind:for="t.id">{{t.name}}</label>
-      <p>{{t.desc}}</p>
+    <div class="row">
+      <div class="col-md-6">
+        <div v-for="t in templates" class="form-group">
+          <input v-bind:id="t.id"
+                 v-bind:name="t.id"
+                 v-bind:value="t.id"
+                 v-model="selected"
+                 type="checkbox"
+                 class="toggle">
+          <label v-bind:for="t.id">{{t.name}}</label>
+          <p>{{t.desc}}</p>
+        </div>
+        
+        <button v-on:click="save()"
+                class="btn btn-primary">
+          Save
+        </button>
+      </div>
+
+      <div class="col-md-6">
+       <div id="latencyPlot"></div>
+      </div>
     </div>
-    
-    <button v-on:click="save()"
-            class="btn btn-primary">
-      Save
-    </button>
   </div>
 </div>

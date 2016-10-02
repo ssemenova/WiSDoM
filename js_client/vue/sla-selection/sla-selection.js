@@ -1,11 +1,10 @@
 const axios = require("axios");
 const Plotly = require("plotly.js/lib/core");
-const slider = require("./slider.vue");
-
 Plotly.register([
     require('plotly.js/lib/bar')
 ]);
 
+const slider = require("./slider.vue");
 
 const _ = {
     max: require("lodash/max"),
@@ -121,7 +120,7 @@ module.exports = {
         templates: function(newTemplates) {
             this.redrawGraph();
             this.saved = false;
-            this.$emit("deadline-changed", null);
+            this.$emit("deadline-changed", false);
         }
     },
 

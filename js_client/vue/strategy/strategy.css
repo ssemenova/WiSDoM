@@ -1,0 +1,50 @@
+.vm {
+    width: 300px;
+    border: 3px solid darkslategray;
+    background-color: ghostwhite;
+    margin: 1em;
+    border-radius: 4px;
+}
+
+.t1 {
+    background-color: red;
+}
+.t2 {
+    background-color: green;
+}
+.t3 {
+    background-color: blue;
+}
+.t4 {
+    background-color: #EEDC00;
+}
+
+.t5 {
+    background-color: fuchsia;
+}
+.sphere {
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    text-align: center;
+    vertical-align: middle;
+    position: relative;
+    /*box-shadow: inset -10px -10px 100px #000, 10px 10px 20px black, inset 0px 0px 10px black;*/
+    display: inline-block;
+    margin-left: .25em;
+    font-weight: bold;
+    padding-top: .05em;
+}
+
+.strat-rec-img {
+    margin-top: 1em;
+}
+
+
+.starter-template {
+    padding: 60px 15px;
+}
+
+.bold {
+    font-weight: bold;
+}

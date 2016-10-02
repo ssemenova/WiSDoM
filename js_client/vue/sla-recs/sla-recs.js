@@ -1,4 +1,5 @@
 const axios = require("axios");
+const deepcopy = require("deepcopy");
 
 module.exports = {
     data: function () {
@@ -73,7 +74,6 @@ module.exports = {
                 return;
             this.sentRequest = true;
             
-            console.log("sending request! deadline: " + this.sla);
             // we are now in the correct mode. send the request...
             axios.post("/slarecs",
                        { "templates": this.templates,
@@ -90,7 +90,10 @@ module.exports = {
         mode: function () { this.checkMode(); },
         sla: function() { this.checkMode(); },
         frequencies: function() { this.checkMode(); },
-        templates: function() { this.checkMode(); }
+        templates: function() { this.checkMode(); },
+        selectedSLA: function() {
+            this.$emit("selected-sla-changed", deepcopy(this.selectedSLA));
+        } 
     }
 
     

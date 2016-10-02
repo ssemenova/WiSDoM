@@ -2,6 +2,7 @@ const learningType = require("./learning-type.vue");
 const queryTemplates = require("./query-templates.vue");
 const slaSelection = require("./sla-selection.vue");
 const slaRecs = require("./sla-recs.vue");
+const strategy = require("./strategy.vue");
 
 module.exports = {
     data: function () {
@@ -9,12 +10,13 @@ module.exports = {
             templates: [],
             frequencies: [],
             mode: false,
-            deadline: false
+            deadline: false,
+            selectedSLA: false
         };
     },
     
     components: {
-        learningType, queryTemplates, slaSelection, slaRecs
+        learningType, queryTemplates, slaSelection, slaRecs, strategy
     },
 
     methods: {
@@ -34,6 +36,10 @@ module.exports = {
 
         frequenciesChanged: function(f) {
             this.frequencies = f;
+        },
+
+        selectedSLAChanged: function (sla) {
+            this.selectedSLA = sla;
         }
     }
 

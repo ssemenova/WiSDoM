@@ -7,7 +7,7 @@
       {{ selectedSLA.deadline }} second deadline selected (click to change)
     </h3>
   </div>
-  <div class="panel-body" v-show="correctMode() && !slaSelected">
+  <div class="panel-body" v-show="correctMode()">
     <div v-show="waiting">
       <p align="center"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></p>
       <p align="center">Please wait...</p>
@@ -17,7 +17,7 @@
       <p>Select an SLA from below.</p>
     </div>
   </div>
-  <table class="table" v-if="!waiting && correctMode() && results && !slaSelected">
+  <table class="table" v-if="!waiting && correctMode() && results">
     <thead>
       <tr><th>#</th><th>Deadline</th><th>Cost</th><th>Select</th></tr>            
     </thead>

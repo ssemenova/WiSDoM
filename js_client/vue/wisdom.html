@@ -25,11 +25,14 @@
       <sla-recs :templates="templates"
                 :frequencies="frequencies"
                 :mode="mode"
-                :sla="deadline">
+                :sla="deadline"
+                v-on:selected-sla-changed="selectedSLAChanged">
       </sla-recs>
-      <div class="col-md-6">
-        <strategy></strategy>
-      </div>
+    </div>
+    <div class="col-md-6">
+      <strategy :sla="selectedSLA"
+                :mode="mode">
+      </strategy>
     </div>
   </div>
 </div>

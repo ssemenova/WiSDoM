@@ -59,6 +59,7 @@ public class Server {
 		get("/querytemplates", Server::sendQueryTemplateInfo);
 		get("/querylatency", Server::sendQueryLatencyInfo);
 		post("/slarecs", Server::sendSLARecommendations);
+		post("/slearn", Server::sendSLearnStrategy);
 
 		exception(Exception.class, (e, req, res) -> {
 			e.printStackTrace();
@@ -67,6 +68,21 @@ public class Server {
 		init();
 	}
 
+	public static Object sendSLearnStrategy(Request req, Response res) {
+		JsonObject data = Json.parse(req.body()).asObject();
+		
+		String sessionID = data.get("sessionID").asString();
+		int slaIdx = data.get("index").asInt();
+		
+		Session s = sessionMap.get(sessionID);
+		s.setSLAIndex(slaIdx);
+		
+		JsonObject toR = Json.object();
+		toR.add("schedule", Server.getJsonVMsForActions(s.doPlacementWithSelected()));
+		
+		return toR;
+	}
+	
 	public static Object sendSLARecommendations(Request req, Response res) {
 		JsonArray suggestions = Json.array().asArray();
 
@@ -104,6 +120,7 @@ public class Server {
 		for (RecommendedSLA sla : s.getRecommendations()) {
 			suggestions.add(Json.object()
 					.add("index", idx)
+					.add("sessionID", sessionID)
 					.add("cost", sla.getCostCents())
 					.add("deadline", sla.getDeadlineSeconds()));
 			idx++;
@@ -114,6 +131,7 @@ public class Server {
 		toR.add("sessionID", sessionID);
 		toR.add("original", Json.object()
 				.add("index", -1)
+				.add("sessionID", sessionID)
 				.add("cost", s.getOriginalSLA().getCostCents())
 				.add("deadline", s.getOriginalSLA().getDeadlineSeconds()));
 		
@@ -329,6 +347,13 @@ public class Server {
 			}
 		}
 
+		return toR;
+	}
+	
+	private static JsonArray getJsonVMsForActions(List<AdvisorAction> actions) {
+		List<VMModel> vms = getVMsForActions(actions);
+		JsonArray toR = Json.array().asArray();
+		vms.stream().map(vm -> vm.toJSON()).forEach(toR::add);
 		return toR;
 	}
 

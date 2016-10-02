@@ -90,8 +90,6 @@ module.exports = {
                 trace.marker.color[trace.marker.color.length - parseInt(x)] = "rgb(31,119,181,1)";
             });
 
-            console.log(trace.marker.color);
-
             Plotly.purge("latencyPlot");
             Plotly.newPlot("latencyPlot",
                            [trace],

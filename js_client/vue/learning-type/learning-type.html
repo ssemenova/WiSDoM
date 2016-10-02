@@ -1,9 +1,9 @@
 <div class="panel panel-default" id="learning_type">
   <div class="panel-heading">
-    <h3 class="panel-title" v-show="!isModeSet()">Learning type</h3>
-    <h3 class="panel-title" v-show="isModeSet()" v-on:click="clearMode()">Learning type: {{mode}} (click to change)</h3>
+    <h3 class="panel-title" v-show="!saved">Learning type</h3>
+    <h3 class="panel-title" v-on:click="clear()" v-show="saved">{{mode}} selected (click to change)</h3>
   </div>
-  <div class="panel-body" v-show="!isModeSet()">
+  <div class="panel-body" v-show="!saved">
     <form>
       <div class="radio">
         <label>
@@ -18,5 +18,23 @@
         </label>
       </div>
     </form>
+
+    <div class="alert alert-warning"
+         role="alert"
+         v-show="isSLearn && !haveTemplates()">
+      <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+      <span class="sr-only">Hold on!</span>
+      Select some query templates first.
+    </div>
+    
+    <div v-show="isSLearn && haveTemplates()" class="form-horizontal">
+      <div class="form-group" v-for="t in templates">
+        <label class="col-sm-2 control-label">Template {{t}}</label>
+        <div class="col-sm-10">
+          <input type="number" class="form-control" v-model="frequencies[t]">
+        </div>
+      </div>
+      <button class="btn btn-primary" v-on:click="save()">Save</button>
+    </div>
   </div>
 </div>

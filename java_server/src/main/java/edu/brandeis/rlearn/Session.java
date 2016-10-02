@@ -28,7 +28,7 @@ import edu.brandeis.wisedb.scheduler.training.CostModelUtil;
  * Created by seaurchi on 9/17/16.
  */
 public class Session {
-    private HashMap<Integer, String> templates;
+    private Set<Integer> templates;
     private Map<Integer, Integer> queryFreqs;
     private List<RecommendedSLA> recommendations;
     private RecommendedSLA originalSLA;
@@ -58,14 +58,14 @@ public class Session {
     }
 
     public Session() {
-        templates = new HashMap<>();
+        templates = new HashSet<>();
     }
 
-    public void setTemplates(HashMap<Integer, String> templates) {
+    public void setTemplates(Set<Integer> templates) {
         this.templates = templates;
     }
 
-    public HashMap<Integer, String> getTemplates() {
+    public Set<Integer> getTemplates() {
         return templates;
     }
 
@@ -77,16 +77,16 @@ public class Session {
         return learnType.equals("S");
     }
 
-    public void addSLA1(String type, String value) {
+    public void addSLA1(String type, int value) {
         SLAtype = type;
-        startLatency = Integer.parseInt(value);
+        startLatency = value;
     }
 
     public void recommendSLA() {
         ios = new HashMap<>();
         latency = new HashMap<>();
         
-        for (Integer selectedTemplate : templates.keySet()) {
+        for (Integer selectedTemplate : templates) {
         	// say that every query takes 1 IO
         	Map<VMType, Integer> iosForThisQuery = new HashMap<>();
         	iosForThisQuery.put(VMType.T2_SMALL, 1);

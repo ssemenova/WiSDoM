@@ -8,14 +8,14 @@ import static spark.Spark.staticFiles;
 import static spark.Spark.webSocket;
 
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
@@ -38,6 +38,7 @@ public class Server {
 	private static Map<Integer, Map<VMType, Integer>> latencies = new HashMap<>();
 	private static Map<VMType, Integer> forMachine = new HashMap<>();
 	private static Map<Integer, String> templateDesc = new HashMap<>();
+	private static AtomicInteger sessionIDCounter = new AtomicInteger(1);
 
 	public static void main(String[] args) {
 		webSocket("/bandit", BanditWebSocket.class);
@@ -54,17 +55,48 @@ public class Server {
 		post("/sendNumQueries", (req, res) -> sendNumQueries(req, null)); //for slearn
 		post("/sendSLA2", (req, res) -> sendSLA2(req, null));
 
-		
+
 		get("/querytemplates", Server::sendQueryTemplateInfo);
 		get("/querylatency", Server::sendQueryLatencyInfo);
-		
+		post("/slarecs", Server::sendSLARecommendations);
+
 		exception(Exception.class, (e, req, res) -> {
 			e.printStackTrace();
 		});
 
 		init();
 	}
-	
+
+	public static Object sendSLARecommendations(Request req, Response res) {
+		JsonArray toR = Json.array().asArray();
+
+		JsonArray templates = Json.parse(req.queryParams("templates")).asArray();
+		int deadline = Integer.valueOf(req.queryParams("deadline"));
+
+		Session s = new Session();
+		sessionMap.put(String.valueOf(sessionIDCounter.getAndIncrement()), s);
+		Set<Integer> selected = StreamSupport.stream(templates.spliterator(), false)
+				.map(v -> v.asInt())
+				.collect(Collectors.toSet());
+		
+		s.setTemplates(selected);
+		s.setLearnType("S");
+		s.addSLA1("deadline", deadline);
+		
+		s.recommendSLA();
+		int idx = 0;
+		for (RecommendedSLA sla : s.getRecommendations()) {
+			toR.add(Json.object()
+					.add("index", idx)
+					.add("cost", sla.getCostCents())
+					.add("deadline", sla.getDeadlineSeconds()));
+		}
+
+
+		res.type("application/json");
+		return toR.toString();
+	}
+
 	public static Object sendQueryTemplateInfo(Request req, Response res) {
 		JsonArray toR = Json.array().asArray();
 		for (Integer t : templates.keySet()) {
@@ -72,24 +104,24 @@ public class Server {
 					.add("id", t)
 					.add("name", templates.get(t))
 					.add("desc", templateDesc.get(t)));
-							
+
 		}
-		
+
 		res.type("application/json");
-		
+
 		return toR.toString();
-		
+
 	}
-	
+
 	public static Object sendQueryLatencyInfo(Request req, Response res) {
 		JsonObject toR = Json.object();
-		
+
 		for (Integer i : templates.keySet()) {
 			toR.add(String.valueOf(i), latencies.get(i).get(VMType.T2_SMALL));
 		}
-		
+
 		res.type("application/json");
-		
+
 		return toR.toString();
 	}
 
@@ -133,7 +165,7 @@ public class Server {
 			return renderFirstPage(req, "You must choose at least one template");
 		}
 
-		session.setTemplates(templatesChosen);
+		session.setTemplates(templatesChosen.keySet());
 		model.put("next-Step", "chooseSLA.vm");
 
 		return renderTemplate(model, "chooseSLA.vm");
@@ -150,7 +182,7 @@ public class Server {
 			return renderTemplate(model, "chooseSLA.vm");
 		}
 
-		session.addSLA1(req.queryParams("type"), req.queryParams("value"));
+		session.addSLA1(req.queryParams("type"), Integer.parseInt(req.queryParams("value")));
 		model.put("SLAvalue", req.queryParams("value"));
 		model.put("SLAtype", req.queryParams("type"));
 
@@ -218,21 +250,21 @@ public class Server {
 				.stream()
 				.map(a -> a.toString())
 				.collect(Collectors.toList()));
-		
+
 		long numVMs = actions.stream()
 				.filter(aa -> aa instanceof AdvisorActionProvision)
 				.count();
-		
+
 		long numQueries = actions.stream()
 				.filter(aa -> aa instanceof AdvisorActionAssign)
 				.count();
-		
+
 		DecimalFormat df = new DecimalFormat(".###");
 		model.put("numVMs", numVMs);
 		model.put("numQueries", numQueries);
 		model.put("queryDensity", df.format((double)numQueries / (double)numVMs));
 		model.put("vms", getVMsForActions(actions));
-		
+
 		model.put("sla", session.getSelectedSLA());
 		model.put("cost", df.format((double)CostUtils.getCostForPlan(session.getSelectedSLA().getModel().getWorkloadSpecification(), actions)/10.0));
 		model.put("Heuristics", session.generateHeuristicCharts(session.getSelectedSLA()));
@@ -259,21 +291,21 @@ public class Server {
 
 		return templatesChosen;
 	}
-	
+
 	private static List<VMModel> getVMsForActions(List<AdvisorAction> actions) {
 		LinkedList<VMModel> toR = new LinkedList<>();
-		
+
 		for (AdvisorAction a : actions) {
 			if (a instanceof AdvisorActionProvision) {
 				toR.add(new VMModel());
 			}
-			
+
 			if (a instanceof AdvisorActionAssign) {
 				AdvisorActionAssign assign = (AdvisorActionAssign) a;
 				toR.peekLast().addQuery(assign.getQueryTypeToAssign());
 			}
 		}
-		
+
 		return toR;
 	}
 

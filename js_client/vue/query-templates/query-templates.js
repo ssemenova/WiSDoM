@@ -11,6 +11,16 @@ module.exports = {
     },
 
     methods: {
+        selectedTemplates: function (){
+            return this.selected
+                .map((itm, idx) => (itm === true) && idx)
+                .filter(itm => itm != false);
+        },
+        numSelected: function () {
+            return this.selected
+                .filter(x => x === true)
+                .length;
+        },
         getTemplates: function () {
             axios.get("/querytemplates")
                 .then((r) => {
@@ -20,17 +30,11 @@ module.exports = {
         
         save: function () {
             this.saved = true;
-            this.$emit("templates-changed", deepcopy(this.selected));
+            this.$emit("templates-changed", deepcopy(this.selectedTemplates()));
         },
 
         clear: function() {
             this.saved = false;
-        },
-
-        countSelected: function () {
-            return this.selected
-                .filter(x => x != null)
-                .length;
         }
     },
     

@@ -1,22 +1,28 @@
 <div class="container" id="wisdom">
   <div class="row">
     <div class="col-md-6">
-      <learning-type></learning-type>
-    </div>
-
-    <div class="col-md-6">
       <query-templates v-on:templates-changed="templatesChanged">
       </query-templates>
+    </div>
+    <div class="col-md-6">
+      <sla-selection :templates="templates"
+                     v-on:deadline-changed="deadlineChanged">
+      </sla-selection>
     </div>
   </div>
 
   <div class="row">
     <div class="col-md-6">
-      <sla-selection v-bind:templates="templates"></sla-selection>
+      <learning-type :templates="templates"
+                     v-on:mode-changed="modeChanged">
+      </learning-type>
     </div>
-
+    
     <div class="col-md-6">
-      <sla-recs></sla-recs>
+      <sla-recs :templates="templates"
+                :mode="mode"
+                :sla="deadline">
+      </sla-recs>
     </div>
   </div>
 

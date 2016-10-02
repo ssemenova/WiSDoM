@@ -1,7 +1,7 @@
 <div class="panel panel-default" id="learning_type">
   <div class="panel-heading">
     <h3 class="panel-title" v-show="!saved">Query selection</h3>
-    <h3 class="panel-title" v-show="saved" v-on:click="clear()">{{ countSelected() }} queries selected (click to change)</h3>
+    <h3 class="panel-title" v-show="saved" v-on:click="clear()">{{ numSelected() }} queries selected (click to change)</h3>
   </div>
   <div v-show="!saved" class="panel-body">
     <div v-for="t in templates" class="form-group">

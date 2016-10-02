@@ -1,0 +1,14 @@
+<div class="panel panel-default" id="learning_type">
+  <div class="panel-heading">
+    <h3 class="panel-title">SLA Recommendations <span v-show="!correctMode">({{ incorrectModeMsg }})</span></h3>
+  </div>
+  <div class="panel-body" v-show="correctMode">
+    <div v-show="waiting">
+      Waiting...
+    </div>
+
+    <div v-show="!waiting">
+
+    </div>
+  </div>
+</div>

@@ -25,7 +25,8 @@ module.exports = {
             latencies: [],
             deadline: 150,
             minValue: 50,
-            maxValue: 150
+            maxValue: 150,
+            saved: false
         };
     },
 
@@ -39,9 +40,16 @@ module.exports = {
         },
 
         haveTemplates: function() {
-            return this.templates
-                .map((itm, idx) => (itm != null) && idx)
-                .length != 0;
+            return this.templates.length != 0;
+        },
+
+        save: function () {
+            this.$emit("deadline-changed", this.deadline);
+            this.saved = true;
+        },
+
+        clearSaved: function () {
+            this.saved = false;
         },
 
         updateSLA: function(value) {
@@ -64,9 +72,7 @@ module.exports = {
         },
 
         redrawGraph: function () {
-            const templateIDs = this.templates
-                      .map((itm, idx) => (itm != null) && idx)
-                      .filter(itm => itm != null);
+            const templateIDs = this.templates;
 
             const ourLatencies = [];
             for (let id in this.latencies) {
@@ -114,6 +120,8 @@ module.exports = {
     watch: {
         templates: function(newTemplates) {
             this.redrawGraph();
+            this.saved = false;
+            this.$emit("deadline-changed", null);
         }
     },
 

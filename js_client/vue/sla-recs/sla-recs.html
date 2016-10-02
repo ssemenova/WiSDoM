@@ -24,13 +24,13 @@
     <tbody>
       <tr>
         <td>1</td>
-        <td>{{ results.original.deadline }} seconds</td>
+        <td>{{ results.original.deadline - 60 }} seconds</td>
         <td>{{ results.original.cost }} cents</td>
         <td><button class="btn btn-primary" v-on:click="selectSLA(-1)">Use Original SLA</button>
       </tr>
       <tr v-for="r in results.suggestions">
         <td>{{ r.index + 2}}</td>
-        <td>{{ r.deadline }} seconds</td>
+        <td>{{ r.deadline - 60}} seconds</td>
         <td>{{ r.cost }} cents</td>
         <td><button class="btn btn-default" v-on:click="selectSLA(r.index)">Use Suggested SLA</button></td>
       </tr>

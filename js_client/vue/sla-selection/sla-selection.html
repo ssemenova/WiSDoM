@@ -1,9 +1,9 @@
 <div class="panel panel-default" id="learning_type">
   <div class="panel-heading">
-    <h3 class="panel-title">SLA Selection
+    <h3 class="panel-title" v-show="!saved">SLA Selection
       <span v-show="!haveTemplates()">(select queries first)</span>
-      <span v-show="saved" v-on:click="clearSaved()">(click to change)</span>
     </h3>
+    <h3 class="panel-title" v-show="saved" v-on:click="clear()">{{ deadline }} second inital SLA (click to change)</h3>
   </div>
   <div class="panel-body" v-show="haveTemplates() && !saved">
     <div class="row">

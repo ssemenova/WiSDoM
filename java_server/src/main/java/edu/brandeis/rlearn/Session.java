@@ -9,6 +9,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
+
 import edu.brandeis.wisedb.AdaptiveModelingUtils;
 import edu.brandeis.wisedb.AdvisorAction;
 import edu.brandeis.wisedb.CostUtils;
@@ -43,7 +46,7 @@ public class Session {
     private int startLatency;
     private final int penalty = 1; //penalty for initial SLA
     private final int numSLAToRecommend = 3; // num of SLAs to recommend
-    private Map<RecommendedSLA, Map<String, Integer>> recHeuristicCost;
+    private Map<RecommendedSLA, JsonObject> recHeuristicCost;
 
     public static final Map<Integer, Integer> templateToLatency = new HashMap<>();
 
@@ -187,14 +190,13 @@ public class Session {
 		this.queryFreqs = queryFreqs;
 	}
 
-	public Map<String, Integer> generateHeuristicCharts(RecommendedSLA SLA) {
+	public JsonObject generateHeuristicCharts() {
+		RecommendedSLA SLA = this.getSelectedSLA();
 	    if (recHeuristicCost.containsKey(SLA)) {
 	        return recHeuristicCost.get(SLA);
         } else {
-            HashMap<String, Integer> costs = new HashMap<>();
 
             Set<ModelQuery> workload = new HashSet<>();
-            // difference from paper: use 2000 instead of 5000 queries for faster schedModelQuery        
             for (Entry<Integer, Integer> e : queryFreqs.entrySet()) {
             	for (int i = 0; i < e.getValue(); i++)
             		workload.add(new ModelQuery(e.getKey()));
@@ -213,14 +215,14 @@ public class Session {
             ffi = CostModelUtil.getCostForPlan(ffiSearch.schedule(workload), wf.getSLA());
             pack9 = CostModelUtil.getCostForPlan(pack9search.schedule(workload), wf.getSLA());
 
-            Map<String, Integer> hCosts = new HashMap<>();
-            hCosts.put("ffd", ffd);
-            hCosts.put("ffi", ffi);
-            hCosts.put("pack9", pack9);
-            hCosts.put("wisedb", (int)(CostUtils.getCostForPlan(getSelectedSLA().getModel().getWorkloadSpecification(), doPlacementWithSelected())/10.0));
-            recHeuristicCost.put(SLA, hCosts);
+            JsonObject toR = Json.object();
+            toR.add("ffd", ffd);
+            toR.add("ffi", ffi);
+            toR.add("pack9", pack9);
+            toR.add("wisedb", (int)(CostUtils.getCostForPlan(getSelectedSLA().getModel().getWorkloadSpecification(), doPlacementWithSelected())/10.0));
+            recHeuristicCost.put(SLA, toR);
             
-            return costs;
+            return toR;
         }
 
     }

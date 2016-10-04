@@ -21,13 +21,11 @@ import java.util.stream.StreamSupport;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
 
 import edu.brandeis.wisedb.AdvisorAction;
 import edu.brandeis.wisedb.AdvisorActionAssign;
 import edu.brandeis.wisedb.AdvisorActionProvision;
 import edu.brandeis.wisedb.CostUtils;
-import edu.brandeis.wisedb.aws.VMType;
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
@@ -60,12 +58,25 @@ public class Server {
 		get("/querylatency", Server::sendQueryLatencyInfo);
 		post("/slarecs", Server::sendSLARecommendations);
 		post("/slearn", Server::sendSLearnStrategy);
+		post("/heuristics", Server::sendHeuristics);
 
 		exception(Exception.class, (e, req, res) -> {
 			e.printStackTrace();
 		});
 
 		init();
+	}
+	
+	public static Object sendHeuristics(Request req, Response res) {
+		JsonObject data = Json.parse(req.body()).asObject();
+		String sessionID = data.get("sessionID").asString();
+		int slaIdx = data.get("index").asInt();
+		
+		Session s = sessionMap.get(sessionID);
+		s.setSLAIndex(slaIdx);
+		
+		res.type("application/json");
+		return s.generateHeuristicCharts();	
 	}
 
 	public static Object sendSLearnStrategy(Request req, Response res) {
@@ -80,6 +91,7 @@ public class Server {
 		JsonObject toR = Json.object();
 		toR.add("schedule", Server.getJsonVMsForActions(s.doPlacementWithSelected()));
 		
+		res.type("application/json");
 		return toR;
 	}
 	
@@ -308,7 +320,7 @@ public class Server {
 
 		model.put("sla", session.getSelectedSLA());
 		model.put("cost", df.format((double)CostUtils.getCostForPlan(session.getSelectedSLA().getModel().getWorkloadSpecification(), actions)/10.0));
-		model.put("Heuristics", session.generateHeuristicCharts(session.getSelectedSLA()));
+		model.put("Heuristics", session.generateHeuristicCharts());
 
 		return renderTemplate(model, "doSLEARN.vm");
 	}

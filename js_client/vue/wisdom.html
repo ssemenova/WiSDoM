@@ -30,9 +30,22 @@
       </sla-recs>
     </div>
     <div class="col-md-6">
+      <div class="panel panel-default" v-if="!mode">
+        <div class="panel-heading">
+          <h3 class="panel-title">Strategy (select a learning type first)</h3>
+        </div>
+      </div>
+
       <strategy :sla="selectedSLA"
-                :mode="mode">
+                :mode="mode"
+                v-if="mode == 'slearn'">
       </strategy>
+
+      <live-display :mode="mode"
+                    :sla="deadline"
+                    v-if="mode =='rlearn'">
+        
+      </live-display>
     </div>
   </div>
 </div>

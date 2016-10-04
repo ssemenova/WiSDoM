@@ -3,8 +3,12 @@
     <h3 class="panel-title">Strategy <span v-show="!sla">(select a recommended SLA first)</span></h3>
   </div>
   <div class="panel-body" v-if="isSLearn()" v-show="haveData">
+    <div v-show="waiting">
+      <p align="center"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></p>
+      <p align="center">WiSeDB is contacting the cloud...</p>
+    </div>
     
-    <div class="well" v-for="vm in strategy">
+    <div class="well" v-for="vm in strategy" v-if="!waiting">
       <div class="row">
 	<div class="col-xs-1">
           <img class="strat-rec-img" width="24px" height="24px" src="assets/server.png"  style="display: inline; vertical-align: bottom;" alt="Virtual machine">

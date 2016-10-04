@@ -28,6 +28,12 @@
                 :sla="deadline"
                 v-on:selected-sla-changed="selectedSLAChanged">
       </sla-recs>
+
+      <slearn-graph :sla="selectedSLA"
+                    :mode="mode"
+                    v-if="mode == 'slearn'">
+      </slearn-graph>
+      
     </div>
     <div class="col-md-6">
       <div class="panel panel-default" v-if="!mode">

@@ -3,25 +3,10 @@
     <h3 class="panel-title">Strategy <span v-show="!sla">(select an SLA first)</span></h3>
   </div>
   <div class="panel-body" v-show="running">
-    <!--<div class="panel panel-default" v-for="(value, key) in vms">
-        <div class="panel-heading">
-          <span class="bold">VM ID: </span>
-          {{ key }}
-        </div>
-        <div class="panel-body">
-          <p>
-            <span class="bold">VM state: </span>
-            {{ value.state }}
-          </p>
-          <p>
-            <span class="bold">Queries: </span>
-            <ol>
-              <li v-for="q in value.queue">{{q}}</li>
-            </ol>
-          </p>
-        </div>
-    </div>-->
-
+    <div v-show="numVMs == 0">
+      <p align="center"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></p>
+      <p align="center">Hold on, contacting the cloud...</p>
+    </div>
 
     <span v-for="(value, key) in vms">
       <div class="well" v-show="value.shouldDisplay" v-bind:key="key">

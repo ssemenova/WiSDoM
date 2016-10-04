@@ -49,7 +49,7 @@
 		<dependency>
 			<groupId>edu.brandeis.wisedb</groupId>
 			<artifactId>wisedb</artifactId>
-			<version>1.0.0</version>
+			<version>7.0.0</version>
 		</dependency>
 
 		<dependency>

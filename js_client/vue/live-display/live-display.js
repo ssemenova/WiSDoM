@@ -17,6 +17,12 @@ module.exports = {
     name: "live-display",
     props: ["mode", "sla"],
 
+    computed: {
+        numVMs: function () {
+            return Object.keys(this.vms).length;
+        }
+    },
+    
     methods: {
         provisionVM: function (vmID, vmType) {
             this.$set(this.vms, vmID, {"id": vmID,

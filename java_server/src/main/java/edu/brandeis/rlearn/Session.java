@@ -38,7 +38,6 @@ public class Session {
     private String learnType;
     private String SLAtype;
     private int slaIdx;
-    WorkloadSpecification wf;
     Map<Integer, Map<VMType, Integer>> ios;
     Map<Integer, Map<VMType, Integer>> latency;
 
@@ -46,7 +45,7 @@ public class Session {
     private int startLatency;
     private final int penalty = 1; //penalty for initial SLA
     private final int numSLAToRecommend = 3; // num of SLAs to recommend
-    private Map<RecommendedSLA, JsonObject> recHeuristicCost;
+    private Map<RecommendedSLA, JsonObject> recHeuristicCost = new HashMap<>();
 
     public static final Map<Integer, Integer> templateToLatency = new HashMap<>();
 
@@ -111,7 +110,7 @@ public class Session {
         	numSteps--;
         }
 
-        wf = new WorkloadSpecification(
+       WorkloadSpecification wf = new WorkloadSpecification(
                 latency,
                 ios,
                 new VMType[] { VMType.T2_SMALL },
@@ -133,6 +132,11 @@ public class Session {
         	recommendations.add(new RecommendedSLA(loosestLatency - (increment * i), models.get(i), cost.get(i)));
         }
         recommendations = minimizeList(recommendations, numSLAToRecommend);
+        
+        // recost the ones we actually picked with GPLSOL
+        recommendations.forEach(r -> r.recost(queryFreqs));
+        getOriginalSLA().recost(queryFreqs);
+        
 //        for (RecommendedSLA recommendation : recommendations) {
 //            recHeuristicCost.put(recommendation, generateHeuristicCharts(recommendation));
 //        }
@@ -151,7 +155,11 @@ public class Session {
     }
     
     public List<AdvisorAction> doPlacementWithSelected() {
-    	return WiSeDBUtils.doPlacement(getSelectedSLA().getModel(), queryFreqs);
+    	// TODO this is a race
+    	WiSeDBUtils.GLPSOL_ENABLED = true;
+    	List<AdvisorAction> toR = WiSeDBUtils.doPlacement(getSelectedSLA().getModel(), queryFreqs);
+    	WiSeDBUtils.GLPSOL_ENABLED = false;
+    	return toR;
     }
     
     public RecommendedSLA getSelectedSLA() {
@@ -194,31 +202,25 @@ public class Session {
 		RecommendedSLA SLA = this.getSelectedSLA();
 	    if (recHeuristicCost.containsKey(SLA)) {
 	        return recHeuristicCost.get(SLA);
-        } else {
-
-            Set<ModelQuery> workload = new HashSet<>();
-            for (Entry<Integer, Integer> e : queryFreqs.entrySet()) {
-            	for (int i = 0; i < e.getValue(); i++)
-            		workload.add(new ModelQuery(e.getKey()));
-            }
-            
-
+        } else {  
             System.out.println("Created sample workload");
 
             int ffd, ffi, pack9;
-
-            GraphSearcher ffdSearch = new FirstFitDecreasingGraphSearch(wf.getSLA(), wf.getQueryTimePredictor());
+            
+            WorkloadSpecification wf = this.getSelectedSLA().getModel().getWorkloadSpecification();
+            
+            GraphSearcher ffdSearch = new FirstFitDecreasingGraphSearch(wf.getSLA(), wf.getQueryTimePredictor(), false);
             GraphSearcher ffiSearch = new FirstFitDecreasingGraphSearch(wf.getSLA(), wf.getQueryTimePredictor(), true);
-            GraphSearcher pack9search = new PackNGraphSearch(9, wf.getQueryTimePredictor(), wf.getSLA());
+            GraphSearcher pack9Search = new PackNGraphSearch(9, wf.getQueryTimePredictor(), wf.getSLA());
 
-            ffd = CostModelUtil.getCostForPlan(ffdSearch.schedule(workload), wf.getSLA());
-            ffi = CostModelUtil.getCostForPlan(ffiSearch.schedule(workload), wf.getSLA());
-            pack9 = CostModelUtil.getCostForPlan(pack9search.schedule(workload), wf.getSLA());
+            ffd = CostUtils.getCostForSearcher(ffdSearch, wf, queryFreqs);
+            ffi = CostUtils.getCostForSearcher(ffiSearch, wf, queryFreqs);
+            pack9 = CostUtils.getCostForSearcher(pack9Search, wf, queryFreqs);
 
             JsonObject toR = Json.object();
-            toR.add("ffd", ffd);
-            toR.add("ffi", ffi);
-            toR.add("pack9", pack9);
+            toR.add("ffd", ffd/10.0);
+            toR.add("ffi", ffi/10.0);
+            toR.add("pack9", pack9/10.0);
             toR.add("wisedb", (int)(CostUtils.getCostForPlan(getSelectedSLA().getModel().getWorkloadSpecification(), doPlacementWithSelected())/10.0));
             recHeuristicCost.put(SLA, toR);
             

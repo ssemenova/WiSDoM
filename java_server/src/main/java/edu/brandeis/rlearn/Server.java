@@ -26,6 +26,7 @@ import edu.brandeis.wisedb.AdvisorAction;
 import edu.brandeis.wisedb.AdvisorActionAssign;
 import edu.brandeis.wisedb.AdvisorActionProvision;
 import edu.brandeis.wisedb.CostUtils;
+import edu.brandeis.wisedb.WiSeDBUtils;
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
@@ -42,6 +43,8 @@ public class Server {
 		webSocket("/bandit", BanditWebSocket.class);
 		staticFiles.externalLocation(System.getenv("js_client"));
 
+		WiSeDBUtils.GLPSOL_PATH = System.getenv("glpsol_path");
+		
 		defineDefaults();
 
 		get("/", (req, res) -> renderFirstPage(req, null));

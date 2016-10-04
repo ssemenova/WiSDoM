@@ -3,7 +3,8 @@ const queryTemplates = require("./query-templates.vue");
 const slaSelection = require("./sla-selection.vue");
 const slaRecs = require("./sla-recs.vue");
 const strategy = require("./strategy.vue");
-const liveDisplay = require("./liveDisplay.vue");
+const liveDisplay = require("./live-display.vue");
+const slearnGraph = require("./slearn-graph.vue");
 
 module.exports = {
     data: function () {
@@ -19,7 +20,8 @@ module.exports = {
     "name": "wisdom-main",
     
     components: {
-        learningType, queryTemplates, slaSelection, slaRecs, strategy, liveDisplay
+        learningType, queryTemplates, slaSelection,
+        slaRecs, strategy, liveDisplay, slearnGraph
     },
 
     methods: {

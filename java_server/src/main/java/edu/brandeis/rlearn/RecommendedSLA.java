@@ -1,6 +1,10 @@
 package edu.brandeis.rlearn;
 
+import java.util.Map;
+
+import edu.brandeis.wisedb.CostUtils;
 import edu.brandeis.wisedb.WiSeDBCachedModel;
+import edu.brandeis.wisedb.WiSeDBUtils;
 
 public class RecommendedSLA {
 	private int deadline;
@@ -31,6 +35,13 @@ public class RecommendedSLA {
 	
 	public int getCostCents() {
 		return getCost() / 10;
+	}
+	
+	public void recost(Map<Integer, Integer> queryFreqs) {
+		// TODO this is a race
+		WiSeDBUtils.GLPSOL_ENABLED = true;
+		cost = CostUtils.getCostForPlan(model.getWorkloadSpecification(),WiSeDBUtils.doPlacement(model, queryFreqs));
+		WiSeDBUtils.GLPSOL_ENABLED = false;
 	}
 	
 	

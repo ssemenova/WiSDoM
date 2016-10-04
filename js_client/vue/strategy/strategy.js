@@ -3,7 +3,8 @@ const axios = require("axios");
 module.exports = {
     data: function () {
         return {
-            strategy: false
+            strategy: false,
+            waiting: true
         };
     },
     
@@ -23,10 +24,11 @@ module.exports = {
 
     watch: {
         sla: function () {
+            this.waiting = true;
             axios.post("/slearn", this.sla)
                 .then(res => {
-                    console.log(res);
                     this.strategy = res.data.schedule;
+                    this.waiting = false;
                 });
                        
         }

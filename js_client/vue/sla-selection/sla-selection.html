@@ -1,0 +1,28 @@
+<div class="panel panel-default" id="learning_type">
+  <div class="panel-heading">
+    <h3 class="panel-title" v-show="!saved">SLA Selection
+      <span v-show="!haveTemplates()">(select queries first)</span>
+    </h3>
+    <h3 class="panel-title" v-show="saved" v-on:click="clear()">{{ deadline }} second inital SLA (click to change)</h3>
+  </div>
+  <div class="panel-body" v-show="haveTemplates() && !saved">
+    <div class="row">
+      <div id="slaPlot"></div>
+    </div>
+    <br/>
+    <p>Adjust the SLA deadline using the slider below. Current deadline: {{ deadline }} seconds. We will add 60 seconds to the deadline to account for VM startup time.</p>
+    <div id="slider">
+      <slider v-bind:min-value="minValue"
+              v-bind:max-value="maxValue"
+              v-on:value-changed="updateSLA">
+      </slider>
+    </div>
+
+    <div id="saveBtn">
+      <button v-on:click="save()"
+              class="btn btn-primary">
+        Save
+      </button>
+    </div>
+  </div>
+</div>

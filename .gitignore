@@ -3,3 +3,7 @@
 .idea/
 target/
 *.iml
+*~
+node_modules
+bundle.min.js
+

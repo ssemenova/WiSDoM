@@ -1,0 +1,13 @@
+#slaPlot .svg-container {
+    margin: auto;
+}
+
+#slider {
+    width: 400px;
+    margin: auto;
+    display: block;
+}
+
+#saveBtn {
+    padding-top: 16px;
+}

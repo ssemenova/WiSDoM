@@ -1,0 +1,35 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Strategy <span v-show="!sla">(select an SLA first)</span></h3>
+  </div>
+  <div class="panel-body" v-show="running">
+    <div v-show="numVMs == 0">
+      <p align="center"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></p>
+      <p align="center">Hold on, contacting the cloud...</p>
+    </div>
+
+    <span v-for="(value, key) in vms">
+      <div class="well" v-show="value.shouldDisplay" v-bind:key="key">
+        <div class="row">
+	  <div class="col-xs-1">
+            <img :class="'strat-rec-img ' + value.state" width="24px" height="24px" src="assets/server.png"  style="display: inline; vertical-align: bottom;" alt="Virtual machine">
+          </div>
+          <div class="col-xs-11">
+            <ul class="list-inline" style="display: inline; padding-left: 10px;">
+              <transition-group name="list-complete" tag="span">
+                <li v-for="q in value.queue" class="list-complete-item" v-bind:key="q">
+                  <div :class="'strat-rec-img sphere t1'"
+	               data-toggle="tooltip"
+	               :title="'Query ID: ' + q">
+                    Q
+                  </div>
+                </li>
+              </transition-group>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </span>
+    
+  </div>
+</div>

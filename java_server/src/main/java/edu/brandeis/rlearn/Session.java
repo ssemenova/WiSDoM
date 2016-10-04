@@ -5,9 +5,11 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
 
 import edu.brandeis.wisedb.AdaptiveModelingUtils;
 import edu.brandeis.wisedb.AdvisorAction;
@@ -16,26 +18,23 @@ import edu.brandeis.wisedb.WiSeDBCachedModel;
 import edu.brandeis.wisedb.WiSeDBUtils;
 import edu.brandeis.wisedb.WorkloadSpecification;
 import edu.brandeis.wisedb.aws.VMType;
-import edu.brandeis.wisedb.cost.ModelQuery;
 import edu.brandeis.wisedb.cost.sla.MaxLatencySLA;
 import edu.brandeis.wisedb.scheduler.FirstFitDecreasingGraphSearch;
 import edu.brandeis.wisedb.scheduler.GraphSearcher;
 import edu.brandeis.wisedb.scheduler.PackNGraphSearch;
-import edu.brandeis.wisedb.scheduler.training.CostModelUtil;
 
 
 /**
  * Created by seaurchi on 9/17/16.
  */
 public class Session {
-    private HashMap<Integer, String> templates;
+    private Set<Integer> templates;
     private Map<Integer, Integer> queryFreqs;
     private List<RecommendedSLA> recommendations;
     private RecommendedSLA originalSLA;
     private String learnType;
     private String SLAtype;
     private int slaIdx;
-    WorkloadSpecification wf;
     Map<Integer, Map<VMType, Integer>> ios;
     Map<Integer, Map<VMType, Integer>> latency;
 
@@ -43,9 +42,9 @@ public class Session {
     private int startLatency;
     private final int penalty = 1; //penalty for initial SLA
     private final int numSLAToRecommend = 3; // num of SLAs to recommend
-    private Map<RecommendedSLA, Map<String, Integer>> recHeuristicCost;
+    private Map<RecommendedSLA, JsonObject> recHeuristicCost = new HashMap<>();
 
-    private static final Map<Integer, Integer> templateToLatency = new HashMap<>();
+    public static final Map<Integer, Integer> templateToLatency = new HashMap<>();
 
     
     static {
@@ -54,19 +53,19 @@ public class Session {
     	templateToLatency.put(3, 4000);
     	templateToLatency.put(4, 5200);
     	templateToLatency.put(5, 8000);
+    	WiSeDBUtils.setThreadCountForTraining(8);
 
     }
 
     public Session() {
-        templates = new HashMap<>();
-        recHeuristicCost = new HashMap<>();
+        templates = new HashSet<>();
     }
 
-    public void setTemplates(HashMap<Integer, String> templates) {
+    public void setTemplates(Set<Integer> templates) {
         this.templates = templates;
     }
 
-    public HashMap<Integer, String> getTemplates() {
+    public Set<Integer> getTemplates() {
         return templates;
     }
 
@@ -78,16 +77,16 @@ public class Session {
         return learnType.equals("S");
     }
 
-    public void addSLA1(String type, String value) {
+    public void addSLA1(String type, int value) {
         SLAtype = type;
-        startLatency = Integer.parseInt(value);
+        startLatency = value;
     }
 
     public void recommendSLA() {
         ios = new HashMap<>();
         latency = new HashMap<>();
         
-        for (Integer selectedTemplate : templates.keySet()) {
+        for (Integer selectedTemplate : templates) {
         	// say that every query takes 1 IO
         	Map<VMType, Integer> iosForThisQuery = new HashMap<>();
         	iosForThisQuery.put(VMType.T2_SMALL, 1);
@@ -108,7 +107,7 @@ public class Session {
         	numSteps--;
         }
 
-        wf = new WorkloadSpecification(
+       WorkloadSpecification wf = new WorkloadSpecification(
                 latency,
                 ios,
                 new VMType[] { VMType.T2_SMALL },
@@ -130,6 +129,15 @@ public class Session {
         	recommendations.add(new RecommendedSLA(loosestLatency - (increment * i), models.get(i), cost.get(i)));
         }
         recommendations = minimizeList(recommendations, numSLAToRecommend);
+
+        
+        // recost the ones we actually picked with GPLSOL
+        recommendations.forEach(r -> r.recost(queryFreqs));
+        getOriginalSLA().recost(queryFreqs);
+        
+//        for (RecommendedSLA recommendation : recommendations) {
+//            recHeuristicCost.put(recommendation, generateHeuristicCharts(recommendation));
+//        }
     }
     
     public RecommendedSLA getOriginalSLA() {
@@ -145,7 +153,11 @@ public class Session {
     }
     
     public List<AdvisorAction> doPlacementWithSelected() {
-    	return WiSeDBUtils.doPlacement(getSelectedSLA().getModel(), queryFreqs);
+    	// TODO this is a race
+    	WiSeDBUtils.GLPSOL_ENABLED = true;
+    	List<AdvisorAction> toR = WiSeDBUtils.doPlacement(getSelectedSLA().getModel(), queryFreqs);
+    	WiSeDBUtils.GLPSOL_ENABLED = false;
+    	return toR;
     }
     
     public RecommendedSLA getSelectedSLA() {
@@ -184,40 +196,33 @@ public class Session {
 		this.queryFreqs = queryFreqs;
 	}
 
-	public Map<String, Integer> generateHeuristicCharts(RecommendedSLA SLA) {
+	public JsonObject generateHeuristicCharts() {
+		RecommendedSLA SLA = this.getSelectedSLA();
 	    if (recHeuristicCost.containsKey(SLA)) {
 	        return recHeuristicCost.get(SLA);
-        } else {
-            HashMap<String, Integer> costs = new HashMap<>();
-
-            Set<ModelQuery> workload = new HashSet<>();
-            // difference from paper: use 2000 instead of 5000 queries for faster schedModelQuery        
-            for (Entry<Integer, Integer> e : queryFreqs.entrySet()) {
-            	for (int i = 0; i < e.getValue(); i++)
-            		workload.add(new ModelQuery(e.getKey()));
-            }
-            
-
+        } else {  
             System.out.println("Created sample workload");
 
             int ffd, ffi, pack9;
-
-            GraphSearcher ffdSearch = new FirstFitDecreasingGraphSearch(wf.getSLA(), wf.getQueryTimePredictor());
-            GraphSearcher ffiSearch = new FirstFitDecreasingGraphSearch(wf.getSLA(), wf.getQueryTimePredictor(), true);
-            GraphSearcher pack9search = new PackNGraphSearch(9, wf.getQueryTimePredictor(), wf.getSLA());
-
-            ffd = CostModelUtil.getCostForPlan(ffdSearch.schedule(workload), wf.getSLA());
-            ffi = CostModelUtil.getCostForPlan(ffiSearch.schedule(workload), wf.getSLA());
-            pack9 = CostModelUtil.getCostForPlan(pack9search.schedule(workload), wf.getSLA());
-
-            Map<String, Integer> hCosts = new HashMap<>();
-            hCosts.put("ffd", ffd);
-            hCosts.put("ffi", ffi);
-            hCosts.put("pack9", pack9);
-            hCosts.put("wisedb", (int)(CostUtils.getCostForPlan(getSelectedSLA().getModel().getWorkloadSpecification(), doPlacementWithSelected())/10.0));
-            recHeuristicCost.put(SLA, hCosts);
             
-            return costs;
+            WorkloadSpecification wf = this.getSelectedSLA().getModel().getWorkloadSpecification();
+            
+            GraphSearcher ffdSearch = new FirstFitDecreasingGraphSearch(wf.getSLA(), wf.getQueryTimePredictor(), false);
+            GraphSearcher ffiSearch = new FirstFitDecreasingGraphSearch(wf.getSLA(), wf.getQueryTimePredictor(), true);
+            GraphSearcher pack9Search = new PackNGraphSearch(9, wf.getQueryTimePredictor(), wf.getSLA());
+
+            ffd = CostUtils.getCostForSearcher(ffdSearch, wf, queryFreqs);
+            ffi = CostUtils.getCostForSearcher(ffiSearch, wf, queryFreqs);
+            pack9 = CostUtils.getCostForSearcher(pack9Search, wf, queryFreqs);
+
+            JsonObject toR = Json.object();
+            toR.add("ffd", ffd/10.0);
+            toR.add("ffi", ffi/10.0);
+            toR.add("pack9", pack9/10.0);
+            toR.add("wisedb", (int)(CostUtils.getCostForPlan(getSelectedSLA().getModel().getWorkloadSpecification(), doPlacementWithSelected())/10.0));
+            recHeuristicCost.put(SLA, toR);
+            
+            return toR;
         }
 
     }

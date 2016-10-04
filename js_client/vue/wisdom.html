@@ -1,0 +1,57 @@
+<div class="container" id="wisdom">
+  <div class="row">
+    <div class="col-md-12">
+      <query-templates v-on:templates-changed="templatesChanged">
+      </query-templates>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <sla-selection :templates="templates"
+                     v-on:deadline-changed="deadlineChanged">
+      </sla-selection>
+    </div>
+    
+    <div class="col-md-6">
+      <learning-type :templates="templates"
+                     v-on:mode-changed="modeChanged"
+                     v-on:frequency-changed="frequenciesChanged">
+      </learning-type>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-6">
+      <sla-recs :templates="templates"
+                :frequencies="frequencies"
+                :mode="mode"
+                :sla="deadline"
+                v-on:selected-sla-changed="selectedSLAChanged">
+      </sla-recs>
+
+      <slearn-graph :sla="selectedSLA"
+                    :mode="mode"
+                    v-if="mode == 'slearn'">
+      </slearn-graph>
+      
+    </div>
+    <div class="col-md-6">
+      <div class="panel panel-default" v-if="!mode">
+        <div class="panel-heading">
+          <h3 class="panel-title">Strategy (select a learning type first)</h3>
+        </div>
+      </div>
+
+      <strategy :sla="selectedSLA"
+                :mode="mode"
+                v-if="mode == 'slearn'">
+      </strategy>
+
+      <live-display :mode="mode"
+                    :sla="deadline"
+                    v-if="mode =='rlearn'">
+        
+      </live-display>
+    </div>
+  </div>
+</div>

@@ -8,34 +8,43 @@ import static spark.Spark.staticFiles;
 import static spark.Spark.webSocket;
 
 import java.text.DecimalFormat;
-import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
 
 import edu.brandeis.wisedb.AdvisorAction;
 import edu.brandeis.wisedb.AdvisorActionAssign;
 import edu.brandeis.wisedb.AdvisorActionProvision;
 import edu.brandeis.wisedb.CostUtils;
-import edu.brandeis.wisedb.aws.VMType;
+import edu.brandeis.wisedb.WiSeDBUtils;
 import spark.ModelAndView;
+import spark.Request;
+import spark.Response;
 import spark.template.velocity.VelocityTemplateEngine;
 
 public class Server {
 
 	private static HashMap<String, Session> sessionMap = new HashMap<>();
 	private static HashMap<Integer, String> templates = new HashMap<>();
-	private static Map<Integer, Map<VMType, Integer>> latencies = new HashMap<>();
-	private static Map<VMType, Integer> forMachine = new HashMap<>();
 	private static Map<Integer, String> templateDesc = new HashMap<>();
+	private static AtomicInteger sessionIDCounter = new AtomicInteger(1);
 
 	public static void main(String[] args) {
 		webSocket("/bandit", BanditWebSocket.class);
-		staticFiles.location("/assets");
+		staticFiles.externalLocation(System.getenv("js_client"));
 
+		WiSeDBUtils.GLPSOL_PATH = System.getenv("glpsol_path");
+		
 		defineDefaults();
 
 		get("/", (req, res) -> renderFirstPage(req, null));
@@ -47,11 +56,130 @@ public class Server {
 		post("/sendNumQueries", (req, res) -> sendNumQueries(req, null)); //for slearn
 		post("/sendSLA2", (req, res) -> sendSLA2(req, null));
 
+
+		get("/querytemplates", Server::sendQueryTemplateInfo);
+		get("/querylatency", Server::sendQueryLatencyInfo);
+		post("/slarecs", Server::sendSLARecommendations);
+		post("/slearn", Server::sendSLearnStrategy);
+		post("/heuristics", Server::sendHeuristics);
+
 		exception(Exception.class, (e, req, res) -> {
 			e.printStackTrace();
 		});
 
 		init();
+	}
+	
+	public static Object sendHeuristics(Request req, Response res) {
+		JsonObject data = Json.parse(req.body()).asObject();
+		String sessionID = data.get("sessionID").asString();
+		int slaIdx = data.get("index").asInt();
+		
+		Session s = sessionMap.get(sessionID);
+		s.setSLAIndex(slaIdx);
+		
+		res.type("application/json");
+		return s.generateHeuristicCharts();	
+	}
+
+	public static Object sendSLearnStrategy(Request req, Response res) {
+		JsonObject data = Json.parse(req.body()).asObject();
+		
+		String sessionID = data.get("sessionID").asString();
+		int slaIdx = data.get("index").asInt();
+		
+		Session s = sessionMap.get(sessionID);
+		s.setSLAIndex(slaIdx);
+		
+		JsonObject toR = Json.object();
+		toR.add("schedule", Server.getJsonVMsForActions(s.doPlacementWithSelected()));
+		
+		res.type("application/json");
+		return toR;
+	}
+	
+	public static Object sendSLARecommendations(Request req, Response res) {
+		JsonArray suggestions = Json.array().asArray();
+
+		System.out.println(req.body());
+		JsonObject data = Json.parse(req.body()).asObject();
+		
+		JsonArray templates = data.get("templates").asArray();
+		JsonArray freqs = data.get("frequencies").asArray();
+		int deadline = (int) data.get("deadline").asDouble();
+		deadline += 60;
+		deadline *= 1000; // convert from seconds to milis
+		
+		
+		Session s = new Session();
+		String sessionID = String.valueOf(sessionIDCounter.getAndIncrement()); 
+		sessionMap.put(sessionID, s);
+		List<Integer> selected = StreamSupport.stream(templates.spliterator(), false)
+				.map(v -> v.asInt())
+				.collect(Collectors.toList());
+		
+		int idx = 0;
+		Map<Integer, Integer> frequencies = new HashMap<>();
+		for (Integer i : selected) {
+			frequencies.put(i, freqs.get(idx).asInt());
+			idx++;
+		}
+		
+		s.setQueryFreqs(frequencies);
+		s.setTemplates(new HashSet<>(selected));
+		s.setLearnType("S");
+		s.addSLA1("deadline", deadline);
+		
+		s.recommendSLA();
+		idx = 0;
+		for (RecommendedSLA sla : s.getRecommendations()) {
+			suggestions.add(Json.object()
+					.add("index", idx)
+					.add("sessionID", sessionID)
+					.add("cost", sla.getCostCents())
+					.add("deadline", sla.getDeadlineSeconds()));
+			idx++;
+		}
+
+		JsonObject toR = Json.object();
+		toR.add("suggestions", suggestions);
+		toR.add("sessionID", sessionID);
+		toR.add("original", Json.object()
+				.add("index", -1)
+				.add("sessionID", sessionID)
+				.add("cost", s.getOriginalSLA().getCostCents())
+				.add("deadline", s.getOriginalSLA().getDeadlineSeconds()));
+		
+		res.type("application/json");
+		return toR.toString();
+	}
+
+	public static Object sendQueryTemplateInfo(Request req, Response res) {
+		JsonArray toR = Json.array().asArray();
+		for (Integer t : templates.keySet()) {
+			toR.add(Json.object()
+					.add("id", t)
+					.add("name", templates.get(t))
+					.add("desc", templateDesc.get(t)));
+
+		}
+
+		res.type("application/json");
+
+		return toR.toString();
+
+	}
+
+	public static Object sendQueryLatencyInfo(Request req, Response res) {
+		JsonObject toR = Json.object();
+
+		for (Integer i : Session.templateToLatency.keySet()) {
+			toR.add(String.valueOf(i), Session.templateToLatency.get(i));
+		}
+
+		res.type("application/json");
+
+		return toR.toString();
 	}
 
 	/* urls */
@@ -63,7 +191,6 @@ public class Server {
 		model.put("next-Step", "initialForm.vm");
 
 		model.put("templates", templates);
-		model.put("latencies", latencies);
 		model.put("desc", templateDesc);
 
 		if (error != null) {
@@ -94,7 +221,7 @@ public class Server {
 			return renderFirstPage(req, "You must choose at least one template");
 		}
 
-		session.setTemplates(templatesChosen);
+		session.setTemplates(templatesChosen.keySet());
 		model.put("next-Step", "chooseSLA.vm");
 
 		return renderTemplate(model, "chooseSLA.vm");
@@ -111,7 +238,7 @@ public class Server {
 			return renderTemplate(model, "chooseSLA.vm");
 		}
 
-		session.addSLA1(req.queryParams("type"), req.queryParams("value"));
+		session.addSLA1(req.queryParams("type"), Integer.parseInt(req.queryParams("value")));
 		model.put("SLAvalue", req.queryParams("value"));
 		model.put("SLAtype", req.queryParams("type"));
 
@@ -179,21 +306,21 @@ public class Server {
 				.stream()
 				.map(a -> a.toString())
 				.collect(Collectors.toList()));
-		
+
 		long numVMs = actions.stream()
 				.filter(aa -> aa instanceof AdvisorActionProvision)
 				.count();
-		
+
 		long numQueries = actions.stream()
 				.filter(aa -> aa instanceof AdvisorActionAssign)
 				.count();
-		
+
 		DecimalFormat df = new DecimalFormat(".###");
 		model.put("numVMs", numVMs);
 		model.put("numQueries", numQueries);
 		model.put("queryDensity", df.format((double)numQueries / (double)numVMs));
 		model.put("vms", getVMsForActions(actions));
-		
+
 		model.put("sla", session.getSelectedSLA());
 		int ffi = 1;
 		int ffd = 2;
@@ -205,6 +332,7 @@ public class Server {
 		model.put("pack9", pack9);
 		model.put("wisedb", wisedb);
 //session.generateHeuristicCharts(session.getSelectedSLA())
+
 		return renderTemplate(model, "doSLEARN.vm");
 	}
 
@@ -227,45 +355,33 @@ public class Server {
 
 		return templatesChosen;
 	}
-	
+
 	private static List<VMModel> getVMsForActions(List<AdvisorAction> actions) {
 		LinkedList<VMModel> toR = new LinkedList<>();
-		
+
 		for (AdvisorAction a : actions) {
 			if (a instanceof AdvisorActionProvision) {
 				toR.add(new VMModel());
 			}
-			
+
 			if (a instanceof AdvisorActionAssign) {
 				AdvisorActionAssign assign = (AdvisorActionAssign) a;
 				toR.peekLast().addQuery(assign.getQueryTypeToAssign());
 			}
 		}
-		
+
+		return toR;
+	}
+	
+	private static JsonArray getJsonVMsForActions(List<AdvisorAction> actions) {
+		List<VMModel> vms = getVMsForActions(actions);
+		JsonArray toR = Json.array().asArray();
+		vms.stream().map(vm -> vm.toJSON()).forEach(toR::add);
 		return toR;
 	}
 
 	/* wise-specific stuff */
 	public static void defineDefaults() {
-		forMachine.put(VMType.T2_SMALL, 20000);
-		latencies.put(1, forMachine);
-
-		forMachine = new HashMap<>();
-		forMachine.put(VMType.T2_SMALL, 30000);
-		latencies.put(2, forMachine);
-
-		forMachine = new HashMap<>();
-		forMachine.put(VMType.T2_SMALL, 40000);
-		latencies.put(3, forMachine);
-
-		forMachine = new HashMap<>();
-		forMachine.put(VMType.T2_SMALL, 52000);
-		latencies.put(4, forMachine);
-
-		forMachine = new HashMap<>();
-		forMachine.put(VMType.T2_SMALL, 80000);
-		latencies.put(5, forMachine);
-
 		templates.put(1, "SQL QUERY 1");
 		templates.put(2, "SQL QUERY 2");
 		templates.put(3, "SQL QUERY 3");

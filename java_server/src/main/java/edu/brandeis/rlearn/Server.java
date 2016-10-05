@@ -47,8 +47,6 @@ public class Server {
 		
 		defineDefaults();
 
-		get("/", (req, res) -> renderFirstPage(req, null));
-
 		//data input workflow:
 		post("/sendInitialDataS", (req, res) -> sendInitialDataS(req, null));
 		post("/sendInitialDataR", (req, res) -> sendInitialDataR(req, null));

@@ -5,6 +5,7 @@ const slaRecs = require("./sla-recs.vue");
 const strategy = require("./strategy.vue");
 const liveDisplay = require("./live-display.vue");
 const slearnGraph = require("./slearn-graph.vue");
+const rlearnGraph = require("./rlearn-graph.vue");
 
 module.exports = {
     data: function () {
@@ -13,7 +14,8 @@ module.exports = {
             frequencies: [],
             mode: false,
             deadline: false,
-            selectedSLA: false
+            selectedSLA: false,
+            rlearnData: []
         };
     },
 
@@ -21,7 +23,8 @@ module.exports = {
     
     components: {
         learningType, queryTemplates, slaSelection,
-        slaRecs, strategy, liveDisplay, slearnGraph
+        slaRecs, strategy, liveDisplay, slearnGraph,
+        rlearnGraph
     },
 
     methods: {
@@ -32,12 +35,12 @@ module.exports = {
         },
 
         modeChanged: function(m) {
-            console.log(m + ", " + (m == 'rlearn'));
             this.mode = m;
         },
 
         deadlineChanged: function(d) {
             this.deadline = d;
+            this.rlearnData = [];
         },
 
         frequenciesChanged: function(f) {
@@ -46,6 +49,10 @@ module.exports = {
 
         selectedSLAChanged: function (sla) {
             this.selectedSLA = sla;
+        },
+
+        gotRLearnData: function (dataPoint) {
+            this.rlearnData.push(dataPoint);
         }
     }
 

@@ -69,8 +69,7 @@ module.exports = {
                     }
                 }
             }
-
-            console.log("at " + tick + " cost is " + cost);
+            this.$emit("rlearn-cost-update", {tick, cost});
         },
 
         start: function() {
@@ -108,6 +107,7 @@ module.exports = {
             if (socket)
                 socket.close();
             this.running = false;
+            this.vms = {};
         },
 
         startIfCorrectMode: function () {

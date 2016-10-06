@@ -26,6 +26,7 @@
                 :frequencies="frequencies"
                 :mode="mode"
                 :sla="deadline"
+                v-if="mode != 'rlearn'"
                 v-on:selected-sla-changed="selectedSLAChanged">
       </sla-recs>
 
@@ -33,6 +34,11 @@
                     :mode="mode"
                     v-if="mode == 'slearn'">
       </slearn-graph>
+
+      <rlearn-graph :mode="mode"
+                    :rlearn-data="rlearnData"
+                    v-if="(mode == 'rlearn') && deadline">
+      </rlearn-graph>
       
     </div>
     <div class="col-md-6">
@@ -49,6 +55,7 @@
 
       <live-display :mode="mode"
                     :sla="deadline"
+                    v-on:rlearn-cost-update="gotRLearnData"
                     v-if="mode =='rlearn'">
         
       </live-display>

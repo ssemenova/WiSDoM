@@ -24,7 +24,7 @@ public class BanditWebSocket implements WebSocketListener, BanditDBSimulatorList
 	@Override
 	public void onWebSocketConnect(Session arg0) {
 		s = arg0;
-		sim = new BanditDBSimulator(200, 700, 300);
+		sim = new BanditDBSimulator(200, 700, 300, 300);
 		sim.addListener(this);
 		sim.start();
 		

@@ -47,8 +47,9 @@ module.exports = {
             this.saved = true;
         },
 
-        clearSaved: function () {
+        clear: function () {
             this.saved = false;
+            this.$emit("deadline-changed", false);
         },
 
         updateSLA: function(value) {

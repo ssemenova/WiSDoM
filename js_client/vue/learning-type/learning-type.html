@@ -14,7 +14,7 @@
       <div class="radio">
         <label class="radio">
           <input type="radio" name="type-radio" value="rlearn" v-model="mode">
-          <strong>Reinforcment learning</strong>: WiSeDB can use a tiered network of <em>contextual multi-armed bandits</em> for <em>online processing</em> of queries that <em>responds to changes on the fly</em>.
+          <strong>Reinforcement learning</strong>: WiSeDB can use a tiered network of <em>contextual multi-armed bandits</em> for <em>online processing</em> of queries that <em>responds to changes on the fly</em>.
         </label>
       </div>
     </form>
@@ -26,7 +26,7 @@
       <span class="sr-only">Hold on!</span>
       Select some query templates first.
     </div>
-    
+
     <div v-show="isSLearn && haveTemplates()" class="form-horizontal">
       <p>Select how many queries of each type to include in the workload.</p>
       <div class="form-group" v-for="t in templates">

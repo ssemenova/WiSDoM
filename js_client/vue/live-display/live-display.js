@@ -51,8 +51,10 @@ module.exports = {
         queryComplete: function (queryID) {
             // TODO this scans all VMs looking for the query. we could
             // keep a mapping.
+            console.log("removing ID: " + queryID);
             for (let k in this.vms) {
-                this.vms[k].queue = this.vms[k].queue.filter(q => q != queryID);
+                this.vms[k].queue = this.vms[k].queue
+                    .filter(q => q.queryID != queryID);
             }
         },
 

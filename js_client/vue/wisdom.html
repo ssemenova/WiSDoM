@@ -11,7 +11,7 @@
                      v-on:deadline-changed="deadlineChanged">
       </sla-selection>
     </div>
-    
+
     <div class="col-md-6">
       <learning-type :templates="templates"
                      v-on:mode-changed="modeChanged"
@@ -19,7 +19,7 @@
       </learning-type>
     </div>
   </div>
-  
+
   <div class="row">
     <div class="col-md-6">
       <sla-recs :templates="templates"
@@ -39,7 +39,7 @@
                     :rlearn-data="rlearnData"
                     v-if="(mode == 'rlearn') && deadline">
       </rlearn-graph>
-      
+
     </div>
     <div class="col-md-6">
       <div class="panel panel-default" v-if="!mode">
@@ -55,10 +55,11 @@
 
       <live-display :mode="mode"
                     :sla="deadline"
+                    :templates="templates"
                     v-on:rlearn-cost-update="gotRLearnData"
                     v-if="mode =='rlearn'">
-        
+
       </live-display>
-    </div>
+    </div>  
   </div>
 </div>

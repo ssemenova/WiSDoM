@@ -33,7 +33,7 @@ module.exports = {
                     this.latencies = r.data;
                 });
         },
-        
+
         save: function () {
             this.saved = true;
             this.$emit("templates-changed", deepcopy(this.selectedTemplates()));
@@ -46,7 +46,7 @@ module.exports = {
         redrawGraph: function () {
             if (this.templates.length == 0 || this.latencies.length == 0)
                 return;
-            
+
             const y = this.templates.map(x => "Q" + x.id);
             const x = this.templates.map(x => this.latencies[x.id]/1000);
             x.reverse();
@@ -86,8 +86,9 @@ module.exports = {
                 trace.marker.color.push("rgb(206,206,206,1)");
             }
 
+            var colors = ["#ff0000", "#00ff00", "#0000ff", "#EEDC00", "#ff0080"];
             this.selected.forEach(function(x) {
-                trace.marker.color[trace.marker.color.length - parseInt(x)] = "rgb(31,119,181,1)";
+                trace.marker.color[trace.marker.color.length - parseInt(x)] = colors[x];
             });
 
             Plotly.purge("latencyPlot");
@@ -103,7 +104,7 @@ module.exports = {
         latencies: function() { this.redrawGraph(); },
         selected: function() { this.redrawGraph(); }
     },
-    
+
     created: function () {
         this.getTemplates();
     }

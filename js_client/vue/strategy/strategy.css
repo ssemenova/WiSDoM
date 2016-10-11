@@ -7,20 +7,25 @@
 }
 
 .t1 {
-    background-color: red;
+    background-color: #ff0000;
+    fill: #ff0000;
 }
 .t2 {
-    background-color: green;
+    background-color: #00ff00;
+    fill: #00ff00;
 }
 .t3 {
-    background-color: blue;
+    background-color: #0000ff;
+    fill: #0000ff;
 }
 .t4 {
     background-color: #EEDC00;
+    fill: #EEDC00;
 }
 
 .t5 {
-    background-color: fuchsia;
+    background-color: #ff0080;
+    fill: #ff0080;
 }
 .sphere {
     height: 24px;

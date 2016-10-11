@@ -1,7 +1,13 @@
 package edu.brandeis.rlearn;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
+import com.amazonaws.util.json.JSONArray;
+import com.amazonaws.util.json.JSONException;
+import com.amazonaws.util.json.JSONObject;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketListener;
 
@@ -9,6 +15,7 @@ import com.eclipsesource.json.Json;
 
 import edu.brandeis.wisedb.rlearn.BanditDBSimulator;
 import edu.brandeis.wisedb.rlearn.BanditDBSimulatorListener;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 
 public class BanditWebSocket implements WebSocketListener, BanditDBSimulatorListener {
 
@@ -18,16 +25,11 @@ public class BanditWebSocket implements WebSocketListener, BanditDBSimulatorList
 	@Override
 	public void onWebSocketClose(int arg0, String arg1) {
 		sim.stop();
-		
 	}
 
 	@Override
 	public void onWebSocketConnect(Session arg0) {
 		s = arg0;
-		sim = new BanditDBSimulator(200, 700, 300, 300);
-		sim.addListener(this);
-		sim.start();
-		
 	}
 
 	@Override
@@ -44,19 +46,50 @@ public class BanditWebSocket implements WebSocketListener, BanditDBSimulatorList
 
 	@Override
 	public void onWebSocketText(String arg0) {
-		// TODO Auto-generated method stub
+		try {
+			System.out.println(arg0);
+			JSONObject json = new JSONObject(arg0);
+			if (json.getString("type").equals("setUp")) {
+				JSONArray templateIDs = json.getJSONArray("templates");
+				List<Integer> templateIDList = new ArrayList<>();
+				for (int i = 0; i < templateIDs.length(); i++) {
+					templateIDList.add(templateIDs.getInt(i));
+				}
+
+				Map<Integer, Integer> templateToLatency = edu.brandeis.rlearn.Session.templateToLatency;
+				List<Integer> templateLatencyList = new ArrayList<>();
+				for (int ID : templateIDList) {
+					templateLatencyList.add(templateToLatency.get(ID));
+				}
+
+				int deadline = json.getInt("deadline");
+
+				sim = new BanditDBSimulator(200,
+						templateLatencyList.stream().mapToInt(i -> i).toArray(),
+						templateIDList.stream().mapToInt(i -> i).toArray(),
+						2000,
+						300,
+						deadline);
+				sim.addListener(this);
+				sim.start();
+			}
+		} catch (JSONException e) {
+			//TODO: fuck java
+			e.printStackTrace();
+		}
 		
 	}
-
 	
 	
 	@Override
-	public void queryAssigned(int qID, int vmID) {
+	public void queryAssigned(int qID, int vmID, int queryTemplate) {
 		try {
+			System.out.println(queryTemplate);
 			s.getRemote().sendString(Json.object()
 					.add("type", "assign")
 					.add("queryID", qID)
 					.add("vmID", vmID)
+					.add("template", queryTemplate)
 					.toString());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

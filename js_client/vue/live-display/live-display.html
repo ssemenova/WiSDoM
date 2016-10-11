@@ -17,11 +17,11 @@
           <div class="col-xs-11">
             <ul class="list-inline" style="display: inline; padding-left: 10px;">
               <transition-group name="list-complete" tag="span">
-                <li v-for="q in value.queue" class="list-complete-item" v-bind:key="q">
-                  <div :class="'strat-rec-img sphere t1'"
+                <li v-for="q in value.queue" class="list-complete-item" v-bind:key="q.queryID">
+                  <div :class="'strat-rec-img sphere t' + q.template"
 	               data-toggle="tooltip"
-	               :title="'Query ID: ' + q">
-                    Q
+	               :title="'Query ID: ' + q.queryID">
+                    {{q.template}}
                   </div>
                 </li>
               </transition-group>
@@ -30,6 +30,6 @@
         </div>
       </div>
     </span>
-    
+
   </div>
 </div>

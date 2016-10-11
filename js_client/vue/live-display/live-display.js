@@ -15,14 +15,14 @@ module.exports = {
     },
 
     name: "live-display",
-    props: ["mode", "sla"],
+    props: ["mode", "sla", "templates"],
 
     computed: {
         numVMs: function () {
             return Object.keys(this.vms).length;
         }
     },
-    
+
     methods: {
         provisionVM: function (vmID, vmType) {
             this.$set(this.vms, vmID, {"id": vmID,
@@ -42,8 +42,8 @@ module.exports = {
             this.vms[vmID].offAt = false;
         },
 
-        assignQuery: function (vmID, queryID) {
-            this.vms[vmID].queue.push(queryID);
+        assignQuery: function (vmID, queryID, template) {
+            this.vms[vmID].queue.push({queryID, template});
             this.vms[vmID].offAt = false;
             this.vms[vmID].shouldDisplay = true;
         },
@@ -74,13 +74,22 @@ module.exports = {
 
         start: function() {
             socket = new WebSocket(url("/bandit"));
+            var msg = {
+                type: "setUp",
+                templates: this.templates,
+                deadline: this.sla
+            };
+            socket.onopen = (event) => {
+                socket.send(JSON.stringify(msg));
+            };
+
             socket.onmessage = (event) => {
                 let data = event.data;
                 data = JSON.parse(data);
                 const msgType = data["type"];
                 switch (msgType) {
                 case "assign":
-                    this.assignQuery(data.vmID, data.queryID);
+                    this.assignQuery(data.vmID, data.queryID, data.template);
                     break;
                 case "complete":
                     this.queryComplete(data.queryID);
@@ -126,7 +135,7 @@ module.exports = {
 
     mounted: function() { this.startIfCorrectMode(); },
     beforeDestroy: function() { this.stop(); }
-    
 
-    
+
+
 };

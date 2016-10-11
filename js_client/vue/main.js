@@ -20,7 +20,7 @@ module.exports = {
     },
 
     "name": "wisdom-main",
-    
+
     components: {
         learningType, queryTemplates, slaSelection,
         slaRecs, strategy, liveDisplay, slearnGraph,

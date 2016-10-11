@@ -86,9 +86,11 @@ module.exports = {
                 trace.marker.color.push("rgb(206,206,206,1)");
             }
 
-            var colors = ["#ff0000", "#00ff00", "#0000ff", "#EEDC00", "#ff0080"];
+            var colors = ["#ff0000", "#00ff00", "#0000ff", "#EEDC00", "#FF0080"];
             this.selected.forEach(function(x) {
-                trace.marker.color[trace.marker.color.length - parseInt(x)] = colors[x];
+                console.log(colors[x]);
+                console.log(x);
+                trace.marker.color[trace.marker.color.length - parseInt(x)] = colors[x-1];
             });
 
             Plotly.purge("latencyPlot");

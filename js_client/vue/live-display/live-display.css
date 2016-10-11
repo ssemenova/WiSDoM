@@ -21,7 +21,7 @@
 
 
 .list-complete-item {
-    transition: all 1s;
+    transition: all 0.25s;
     display: inline-block;
     margin-right: 10px;
 }

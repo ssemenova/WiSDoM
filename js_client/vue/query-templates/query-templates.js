@@ -86,10 +86,8 @@ module.exports = {
                 trace.marker.color.push("rgb(206,206,206,1)");
             }
 
-            var colors = ["#ff0000", "#00ff00", "#0000ff", "#EEDC00", "#FF0080"];
+            var colors = ["#F79256", "#FBD1A2", "#7DCFB6", "#00B2CA", "#1D4E89"];
             this.selected.forEach(function(x) {
-                console.log(colors[x]);
-                console.log(x);
                 trace.marker.color[trace.marker.color.length - parseInt(x)] = colors[x-1];
             });
 

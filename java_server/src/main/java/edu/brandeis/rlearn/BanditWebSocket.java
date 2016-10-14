@@ -84,7 +84,6 @@ public class BanditWebSocket implements WebSocketListener, BanditDBSimulatorList
 	@Override
 	public void queryAssigned(int qID, int vmID, int queryTemplate) {
 		try {
-			System.out.println(queryTemplate);
 			s.getRemote().sendString(Json.object()
 					.add("type", "assign")
 					.add("queryID", qID)

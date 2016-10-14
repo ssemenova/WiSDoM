@@ -1,0 +1,12 @@
+.cursor {
+    cursor: pointer;
+}
+.cursor:hover {
+    text-decoration: none;
+}
+
+.panel-primary { border-color: #00B2CA; }
+.panel-primary .panel-heading { background-color: #00B2CA; border-color: #00B2CA; }
+.panel-warning { border-color: #F79256; }
+.panel-warning .panel-heading { background-color: #F79256; border-color: #F79256; }
+.panel-warning .panel-title, .panel-primary .panel-title { color: white; }

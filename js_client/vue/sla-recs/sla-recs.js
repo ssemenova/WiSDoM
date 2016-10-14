@@ -67,14 +67,18 @@ module.exports = {
                 this.waiting = true;
                 this.selectedSLA = false;
                 this.sentRequest = false;
+                console.log("mode no good");
                 return;
             }
+
+            console.log("mode good!");
 
             if (this.sentRequest)
                 return;
             this.sentRequest = true;
             
             // we are now in the correct mode. send the request...
+            console.log("sending request...");
             axios.post("/slarecs",
                        { "templates": this.templates,
                          "deadline": this.sla,
@@ -87,13 +91,17 @@ module.exports = {
     },
 
     watch: {
-        mode: function () { this.checkMode(); },
+        mode: function () { console.log("mode watch!"); this.checkMode(); },
         sla: function() { this.checkMode(); },
         frequencies: function() { this.checkMode(); },
         templates: function() { this.checkMode(); },
         selectedSLA: function() {
             this.$emit("selected-sla-changed", deepcopy(this.selectedSLA));
         } 
+    },
+
+    created: function() {
+        this.checkMode();
     }
 
     

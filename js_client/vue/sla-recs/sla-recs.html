@@ -1,11 +1,6 @@
-<div class="panel panel-default" id="learning_type">
+<div class="panel panel-warning" id="learning_type">
   <div class="panel-heading">
-    <h3 class="panel-title" v-show="!slaSelected">SLA Recommendations <span v-show="!correctMode()">({{ incorrectModeMsg }})</span></h3>
-    <h3 class="panel-title"
-        v-on:click="clear()"
-        v-show="slaSelected">
-      {{ selectedSLA.deadline }} second deadline selected (click to change)
-    </h3>
+    <h3 class="panel-title">SLA Recommendations</h3>
   </div>
   <div class="panel-body" v-show="correctMode()">
     <div v-show="waiting">

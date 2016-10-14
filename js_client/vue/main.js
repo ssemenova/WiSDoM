@@ -35,6 +35,7 @@ module.exports = {
         },
 
         modeChanged: function(m) {
+            console.log("got mode change in main.js");
             this.mode = m;
         },
 

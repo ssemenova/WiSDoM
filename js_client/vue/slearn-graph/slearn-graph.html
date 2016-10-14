@@ -1,6 +1,6 @@
-<div class="panel panel-success">
+<div :class="{'panel': true, 'panel-primary': !waiting, 'panel-default': waiting}">
   <div class="panel-heading">
-    <h3 class="panel-title">Performance <span v-show="!sla">(select a recommended SLA first)</span></h3>
+    <h3 class="panel-title">Performance</h3>
   </div>
   <div class="panel-body" v-show="sla">
     <div v-show="waiting">

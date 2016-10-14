@@ -31,6 +31,7 @@ module.exports = {
 
         save: function () {
             this.saved = true;
+            console.log("emitting mode change");
             this.$emit("mode-changed", this.mode);
             if (this.mode == "slearn")
                 this.$emit("frequency-changed",

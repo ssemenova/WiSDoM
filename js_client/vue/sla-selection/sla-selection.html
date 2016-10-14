@@ -1,11 +1,13 @@
-<div class="panel panel-default" id="learning_type">
+<div :class="{'panel': true, 'panel-default': !haveTemplates(), 'panel-primary': saved, 'panel-warning': !saved && haveTemplates()}" id="learning_type">
   <div class="panel-heading">
-    <h3 class="panel-title" v-show="!saved">SLA Selection
-      <span v-show="!haveTemplates()">(select queries first)</span>
+    <h3 class="panel-title">SLA Selection
+      <a v-show="saved"
+         v-on:click="clear()"
+         class="cursor fa fa-pencil pull-right">
+      </a>
     </h3>
-    <h3 class="panel-title" v-show="saved" v-on:click="clear()">{{ deadline }} second inital SLA (click to change)</h3>
   </div>
-  <div class="panel-body" v-show="haveTemplates() && !saved">
+  <div class="panel-body" v-show="haveTemplates()">
     <div class="row">
       <div id="slaPlot"></div>
     </div>
@@ -14,13 +16,14 @@
     <div id="slider">
       <slider v-bind:min-value="minValue"
               v-bind:max-value="maxValue"
-              v-on:value-changed="updateSLA">
+              v-on:value-changed="updateSLA"
+              :disabled="saved">
       </slider>
     </div>
 
     <div id="saveBtn">
       <button v-on:click="save()"
-              class="btn btn-primary">
+              :class="{ btn: true, 'btn-primary': true, disabled: saved}">
         Save
       </button>
     </div>

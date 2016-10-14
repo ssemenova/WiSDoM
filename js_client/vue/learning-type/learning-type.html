@@ -1,31 +1,29 @@
-<div class="panel panel-default" id="learning_type">
+<div :class="{'panel': true, 'panel-default': !haveTemplates(), 'panel-primary': saved, 'panel-warning': !saved && haveTemplates()}" id="learning_type">
   <div class="panel-heading">
-    <h3 class="panel-title" v-show="!saved">Learning type</h3>
-    <h3 class="panel-title" v-on:click="clear()" v-show="saved">{{mode}} selected (click to change)</h3>
+    <h3 class="panel-title">Learning type
+      <a v-show="saved"
+         v-on:click="clear()"
+         class="cursor fa fa-pencil pull-right">
+      </a>
+    </h3>
   </div>
-  <div class="panel-body" v-show="!saved">
+  <div class="panel-body" v-show="haveTemplates()">
     <form>
-      <div class="radio">
-        <label>
-          <input type="radio" name="type-radio" value="slearn" v-model="mode">
-          <strong>Supervised learning</strong>: WiSeDB can generate <em>decision tree models</em> tailored to a specific application's workload. This supports <em>SLA recommendation</em> and <em>batch scheduling</em>.
-        </label>
-      </div>
-      <div class="radio">
-        <label class="radio">
-          <input type="radio" name="type-radio" value="rlearn" v-model="mode">
-          <strong>Reinforcement learning</strong>: WiSeDB can use a tiered network of <em>contextual multi-armed bandits</em> for <em>online processing</em> of queries that <em>responds to changes on the fly</em>.
-        </label>
-      </div>
+      <fieldset v-bind:disabled="saved">
+        <div class="radio">
+          <label>
+            <input type="radio" name="type-radio" value="slearn" v-model="mode">
+            <strong>Supervised learning</strong>: WiSeDB can generate <em>decision tree models</em> tailored to a specific application's workload. This supports <em>SLA recommendation</em> and <em>batch scheduling</em>.
+          </label>
+        </div>
+        <div class="radio">
+          <label class="radio">
+            <input type="radio" name="type-radio" value="rlearn" v-model="mode">
+            <strong>Reinforcement learning</strong>: WiSeDB can use a tiered network of <em>contextual multi-armed bandits</em> for <em>online processing</em> of queries that <em>responds to changes on the fly</em>.
+          </label>
+        </div>
+      </fieldset>
     </form>
-
-    <div class="alert alert-warning"
-         role="alert"
-         v-show="isSLearn && !haveTemplates()">
-      <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-      <span class="sr-only">Hold on!</span>
-      Select some query templates first.
-    </div>
 
     <div v-show="isSLearn && haveTemplates()" class="form-horizontal">
       <p>Select how many queries of each type to include in the workload.</p>
@@ -35,7 +33,11 @@
           <input type="number" class="form-control" v-model="frequencies[t]">
         </div>
       </div>
-      <button class="btn btn-primary" v-on:click="save()">Save</button>
     </div>
+
+    <button v-on:click="save()"
+            :class="{ btn: true, 'btn-primary': true, disabled: saved || !mode}">
+      Save
+    </button>
   </div>
 </div>

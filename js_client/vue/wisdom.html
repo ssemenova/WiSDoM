@@ -26,7 +26,7 @@
                 :frequencies="frequencies"
                 :mode="mode"
                 :sla="deadline"
-                v-if="mode != 'rlearn'"
+                v-if="mode == 'slearn'"
                 v-on:selected-sla-changed="selectedSLAChanged">
       </sla-recs>
 
@@ -42,12 +42,6 @@
 
     </div>
     <div class="col-md-6">
-      <div class="panel panel-default" v-if="!mode">
-        <div class="panel-heading">
-          <h3 class="panel-title">Strategy (select a learning type first)</h3>
-        </div>
-      </div>
-
       <strategy :sla="selectedSLA"
                 :mode="mode"
                 v-if="mode == 'slearn'">

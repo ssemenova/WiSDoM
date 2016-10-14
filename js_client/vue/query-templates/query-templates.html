@@ -1,30 +1,35 @@
-<div class="panel panel-default" id="learning_type">
+<div :class="{'panel': true, 'panel-primary': saved, 'panel-warning': !saved}" id="learning_type">
   <div class="panel-heading">
-    <h3 class="panel-title" v-show="!saved">Query selection</h3>
-    <h3 class="panel-title" v-show="saved" v-on:click="clear()">{{ numSelected() }} queries selected (click to change)</h3>
+    <h3 class="panel-title">Query selection
+      <a v-show="saved"
+         v-on:click="clear()"
+         class="cursor fa fa-pencil pull-right">
+      </a>
+    </h3>
   </div>
-  <div v-show="!saved" class="panel-body">
+  <div class="panel-body">
     <div class="row">
       <div class="col-md-6">
-        <div v-for="t in templates" class="form-group">
-          <input v-bind:id="t.id"
-                 v-bind:name="t.id"
-                 v-bind:value="t.id"
-                 v-model="selected"
-                 type="checkbox"
-                 class="toggle">
-          <label v-bind:for="t.id">{{t.name}}</label>
-          <p>{{t.desc}}</p>
-        </div>
-        
-        <button v-on:click="save()"
-                class="btn btn-primary">
-          Save
-        </button>
+        <fieldset v-bind:disabled="saved">
+          <div v-for="t in templates" class="form-group">
+            <input v-bind:id="t.id"
+                   v-bind:name="t.id"
+                   v-bind:value="t.id"
+                   v-model="selected"
+                   type="checkbox">
+              <label v-bind:for="t.id">{{t.name}}</label>
+            <p>{{t.desc}}</p>
+          </div>
+          
+          <button v-on:click="save()"
+                  :class="{ btn: true, 'btn-primary': true, disabled: saved}">
+            Save
+          </button>
+        </fieldset>
       </div>
-
+      
       <div class="col-md-6">
-       <div id="latencyPlot"></div>
+        <div id="latencyPlot"></div>
       </div>
     </div>
   </div>

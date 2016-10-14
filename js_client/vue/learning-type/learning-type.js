@@ -31,8 +31,10 @@ module.exports = {
 
         save: function () {
             this.saved = true;
-            this.$emit("mode-changed", this.mode); // slearn
-            this.$emit("frequency-changed", this.getFreqs());
+            this.$emit("mode-changed", this.mode);
+            if (this.mode == "slearn")
+                this.$emit("frequency-changed",
+                           this.getFreqs());
         },
 
         haveTemplates: function() {
@@ -41,13 +43,6 @@ module.exports = {
     },
 
     watch: {
-        mode: function(m) {
-            if (this.mode == "rlearn") {
-                this.$emit("mode-changed", m);
-                this.saved = true;
-            }
-        },
-
         templates: function(t) {
             this.saved = false;
             this.$emit("frequency-changed", []);

@@ -1,4 +1,4 @@
-<div :class="{'panel': true, 'panel-primary': !waiting, 'panel-default': waiting}">
+<div :class="{'panel': true, 'panel-success': !waiting, 'panel-default': waiting}">
   <div class="panel-heading">
     <h3 class="panel-title">Strategy</h3>
   </div>
@@ -7,7 +7,7 @@
       <p align="center"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></p>
       <p align="center">WiSeDB is contacting the cloud...</p>
     </div>
-    
+
     <div class="well" v-for="vm in strategy" v-if="!waiting">
       <div class="row">
 	<div class="col-xs-1">
@@ -26,6 +26,6 @@
         </div>
       </div>
     </div>
-    
+
   </div>
 </div>

@@ -1,3 +1,7 @@
 #slearnGraph .svg-container {
     margin: auto;
 }
+
+.performance.panel-body {
+    height: 360px;
+}

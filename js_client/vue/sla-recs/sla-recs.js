@@ -17,24 +17,24 @@ module.exports = {
         slaSelected: function() {
             return this.correctMode() && this.selectedSLA;
         },
-        
+
         incorrectModeMsg: function () {
             if (!this.haveTemplates())
                 return "select templates first";
-            
+
             if (!this.sla)
                 return "select initial SLA first";
-            
+
             if (!this.mode || this.mode == "rlearn")
                 return "only available for supervised";
-            
+
             if (this.frequencies.length == 0)
                 return "set query frequencies first";
 
             return "";
         }
     },
-    
+
     methods: {
         correctMode: function () {
             return (this.mode == "slearn")
@@ -76,7 +76,7 @@ module.exports = {
             if (this.sentRequest)
                 return;
             this.sentRequest = true;
-            
+
             // we are now in the correct mode. send the request...
             console.log("sending request...");
             axios.post("/slarecs",
@@ -97,12 +97,12 @@ module.exports = {
         templates: function() { this.checkMode(); },
         selectedSLA: function() {
             this.$emit("selected-sla-changed", deepcopy(this.selectedSLA));
-        } 
+        }
     },
 
     created: function() {
         this.checkMode();
     }
 
-    
+
 };

@@ -7,7 +7,7 @@ module.exports = {
             waiting: true
         };
     },
-    
+
     props: ["sla", "mode"],
 
     computed: {
@@ -15,7 +15,7 @@ module.exports = {
             return this.strategy !== false;
         }
     },
-    
+
     methods: {
         isSLearn: function() {
             return this.mode == "slearn";
@@ -30,7 +30,7 @@ module.exports = {
                     this.strategy = res.data.schedule;
                     this.waiting = false;
                 });
-                       
+
         }
     }
 };

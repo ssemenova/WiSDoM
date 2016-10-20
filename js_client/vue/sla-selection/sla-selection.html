@@ -8,24 +8,39 @@
     </h3>
   </div>
   <div class="panel-body" v-show="haveTemplates()">
-    <div class="row">
       <div id="slaPlot"></div>
+      <div class="row padding">
+          <div class="col-xs-12">
+              <p>Adjust the SLA deadline using the slider below. Current deadline: <b>{{ deadline }} seconds</b>. We will add 60 seconds to the deadline to account for VM startup time.</p>
+          </div>
+          <div class="col-xs-10 col-xs-offset-1">
+              <div id="slider">
+                  <slider v-bind:min-value="minValue"
+                      v-bind:max-value="maxValue"
+                      v-on:value-changed="updateSLA"
+                      :disabled="saved">
+                  </slider>
+              </div>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-xs-8 col-xs-offset-1">
+              <div class="form-group">
+                  <label for="SLAType">SLA Type</label>
+                  <select v-model="SLAType" class="form-control" id="SLAType">
+                    <option>Max</option>
+                    <option>Average</option>
+                    <option>Percentile</option>
+                  </select>
+              </div>
+          </div>
+          <div class="col-xs-2">
+              <div id="saveBtn">
+                  <button v-on:click="save()" :class="{ btn: true, 'btn-primary': true, disabled: saved}" class="pull-right">
+                      Save
+                  </button>
+              </div>
+          </div>
+      </div>
     </div>
-    <br/>
-    <p>Adjust the SLA deadline using the slider below. Current deadline: {{ deadline }} seconds. We will add 60 seconds to the deadline to account for VM startup time.</p>
-    <div id="slider">
-      <slider v-bind:min-value="minValue"
-              v-bind:max-value="maxValue"
-              v-on:value-changed="updateSLA"
-              :disabled="saved">
-      </slider>
-    </div>
-
-    <div id="saveBtn">
-      <button v-on:click="save()"
-              :class="{ btn: true, 'btn-primary': true, disabled: saved}">
-        Save
-      </button>
-    </div>
-  </div>
 </div>

@@ -1,3 +1,7 @@
 #latencyPlot .svg-container {
     margin: auto;
 }
+
+label {
+    padding-left: .4em;
+}

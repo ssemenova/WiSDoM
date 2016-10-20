@@ -177,7 +177,7 @@ module.exports = {
 
     mounted: function () {
         nouislider.create(this.$el, {
-            start: [ 0 ],
+            start: [ 20 ],
             step: 1,
             range: {
                 'min': [ parseInt(this.minValue) ],
@@ -204,7 +204,7 @@ module.exports = {
                 }
             }, true);
         },
-        
+
         minValue: function(val, oldVal) {
             this.$el.noUiSlider.updateOptions({
                 range: {

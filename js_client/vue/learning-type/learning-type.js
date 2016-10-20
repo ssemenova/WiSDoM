@@ -9,8 +9,8 @@ module.exports = {
         };
     },
 
-    props: ["templates"],
-    
+    props: ["templates", "deadline"],
+
     computed: {
         isSLearn: function () {
             return this.mode == "slearn";
@@ -36,6 +36,9 @@ module.exports = {
             if (this.mode == "slearn")
                 this.$emit("frequency-changed",
                            this.getFreqs());
+           if (this.deadline && this.mode) {
+               $("html, body").animate({ scrollTop: $("#results").offset().top }, 900);
+           }
         },
 
         haveTemplates: function() {

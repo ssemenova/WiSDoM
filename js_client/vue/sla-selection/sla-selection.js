@@ -24,14 +24,15 @@ module.exports = {
             groups: [],
             latencies: [],
             deadline: 150,
-            minValue: 10,
+            minValue: 9,
             maxValue: 32,
             saved: false,
-            graphColors: []
+            graphColors: [],
+            SLAType: 'Max'
         };
     },
 
-    props: ['templates'],
+    props: ['mode', 'templates'],
     methods: {
         getLatencyInfo: function () {
             axios.get("/querylatency")
@@ -47,6 +48,9 @@ module.exports = {
         save: function () {
             this.$emit("deadline-changed", parseFloat(this.deadline));
             this.saved = true;
+            if (this.deadline && this.mode) {
+                $("html, body").animate({ scrollTop: $("#results").offset().top }, 900);
+            }
         },
 
         clear: function () {
@@ -172,6 +176,11 @@ module.exports = {
 
     watch: {
         templates: function(newTemplates) {
+            this.redrawGraph();
+            this.saved = false;
+            this.$emit("deadline-changed", false);
+        },
+        SLAType: function() {
             this.redrawGraph();
             this.saved = false;
             this.$emit("deadline-changed", false);

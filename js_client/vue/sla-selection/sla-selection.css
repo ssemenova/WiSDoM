@@ -3,11 +3,16 @@
 }
 
 #slider {
-    width: 400px;
+    width: auto;
     margin: auto;
     display: block;
 }
 
-#saveBtn {
-    padding-top: 16px;
+.padding, #slider {
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+#saveBtn button {
+    margin-top: 1.7em;
 }

@@ -12,3 +12,7 @@
 .panel-warning .panel-title, .panel-primary .panel-title, .panel-success .panel-heading { color: white; }
 .panel-success>.panel-heading { background-color: #7DCFB6; border-color: #7DCFB6;
 }
+
+body {
+    font-family: Helvetica, Arial;
+}

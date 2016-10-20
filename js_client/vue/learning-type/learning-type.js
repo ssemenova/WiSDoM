@@ -5,7 +5,7 @@ module.exports = {
         return {
             mode: false,
             saved: false,
-            frequencies: [10,10,10,10,10,10,10,10,10,10,10]
+            frequencies: [5,5,5,5,5,5,5,5,5,5,5]
         };
     },
 

@@ -8,7 +8,10 @@ module.exports = {
     data: function () {
         return {
             costs: {},
-            waiting: true
+            waiting: true,
+            requestedCloud: false,
+            waitingOnCloud: true,
+            cloudCost: 0
         };
     },
 
@@ -36,23 +39,44 @@ module.exports = {
 
             const x = ["FFD", "FFI", "Pack9", "WiSeDB"];
             const y = [this.costs.ffd, this.costs.ffi, this.costs.pack9, this.costs.wisedb];
+
+            if ((!this.waitingOnCloud) && this.requestedCloud) {
+                x.push("Actual cost");
+                y.push(this.cloudCost);
+            }
+            
             Plotly.purge("slearnGraph");
             Plotly.newPlot("slearnGraph",
                            [{x, y, type: "bar", name: "Cost"}],
                            layout, {displayModeBar: false});
+        },
+
+        sendToCloud: function () {
+            this.requestedCloud = true;
+            this.waitingOnCloud = true;
+            axios.post("/cloudrun", this.sla)
+                .then((res) => {
+                    this.cloudCost = res.data.actualCost;
+                    this.waitingOnCloud = false;
+                    this.redrawGraph();
+                }).catch((err) => console.log);
         }
+        
     },
 
     watch: {
         sla: function (newSLA) {
             this.waiting = true;
+            this.waitingOnCloud = true;
+            this.requestedCloud = false;
             axios.post("/heuristics", newSLA)
                 .then((res) => {
-                    console.log(res.data);
                     this.costs = res.data;
                     this.redrawGraph();
                     this.waiting = false;
                 });
+
+           
         }
     }
 };

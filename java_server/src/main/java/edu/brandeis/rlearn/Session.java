@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -226,6 +227,22 @@ public class Session {
         }
 
     }
+
+	public JsonObject getCloudCost() {
+		JsonObject toR = Json.object();
+		int wiseCost = (int)(CostUtils.getCostForPlan(getSelectedSLA().getModel().getWorkloadSpecification(), doPlacementWithSelected())/10.0);
+		double cloudCost = ((new Random()).nextDouble() - 0.5) + wiseCost;
+		toR.add("actualCost", cloudCost);
+		
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return toR;
+	}
 
 
 }

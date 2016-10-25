@@ -13,8 +13,8 @@
         class="btn btn-primary"
         v-show="!waiting && (!requestedCloud || waitingOnCloud)"
         v-on:click="sendToCloud">
-        <i v-if="requestedCloud && waitingOnCloud" class="fa fa-spinner fa-spin"></i>
         Run on Cloud
+        <i v-if="requestedCloud && waitingOnCloud" class="fa fa-spinner fa-spin"></i>
       </button>
     </div>
   </div>

@@ -155,7 +155,7 @@ public class Session {
     
     public List<AdvisorAction> doPlacementWithSelected() {
     	// TODO this is a race
-    	WiSeDBUtils.GLPSOL_ENABLED = true;
+    	//WiSeDBUtils.GLPSOL_ENABLED = true;
     	List<AdvisorAction> toR = WiSeDBUtils.doPlacement(getSelectedSLA().getModel(), queryFreqs);
     	WiSeDBUtils.GLPSOL_ENABLED = false;
     	return toR;

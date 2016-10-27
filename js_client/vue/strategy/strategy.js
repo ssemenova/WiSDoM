@@ -25,6 +25,7 @@ module.exports = {
     watch: {
         sla: function () {
             this.waiting = true;
+            console.log(JSON.stringify(this.sla));
             axios.post("/slearn", this.sla)
                 .then(res => {
                     this.strategy = res.data.schedule;

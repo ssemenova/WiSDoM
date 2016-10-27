@@ -1,5 +1,5 @@
 # WiSDoM
-## [W]orkload Adv[i]sor [Service] [D]em[o] [M]odule
+## [W]orkload Adv[i]sor [S]ervice [D]em[o] [M]odule
 
 To run, execute `Server.java` with the following environmental variables set:
 

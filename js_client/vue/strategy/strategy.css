@@ -47,3 +47,15 @@
 .bold {
     font-weight: bold;
 }
+
+.show-tree-button {
+    margin-bottom: 1em;
+}
+
+.pull-right {
+    float: right;
+}
+
+.previous-button, .next-button {
+    margin: 2em;
+}

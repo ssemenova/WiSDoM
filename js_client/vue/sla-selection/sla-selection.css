@@ -1,5 +1,7 @@
 #slaPlot .svg-container {
     margin: auto;
+    max-width: 450px;
+    width: auto;
 }
 
 #slider {
@@ -15,4 +17,8 @@
 
 #saveBtn button {
     margin-top: 1.7em;
+}
+
+.panel-body {
+    overflow-x: hidden;
 }

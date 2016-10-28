@@ -8,6 +8,29 @@
       <p align="center">WiSeDB is contacting the cloud...</p>
     </div>
 
+    <div class="modal fade decision-tree-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" v-if="!waiting">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <center>
+                        <img class="img-responsive decision-tree" :src="decisionTreePng"></img>
+                    </center>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <button :class="{ btn: true, 'btn-primary': true, disabled: firstImg, 'previous-button': true, }">Previous</button>
+                </div>
+                <div class="col-xs-6">
+                    <button :class="{ btn: true, 'btn-primary': true, disabled: lastImg, 'next-button': true, 'pull-right': true}" v-on:click="loadNext()">Next</button>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+
+
     <div class="well" v-for="vm in strategy" v-if="!waiting">
       <div class="row">
 	<div class="col-xs-1">
@@ -25,6 +48,12 @@
           </ul>
         </div>
       </div>
+    </div>
+
+    <div class="row" v-if="!waiting">
+        <div class="col-xs-12">
+            <button class="btn btn-primary show-tree-button pull-right" data-toggle="modal" data-target=".decision-tree-modal">See Decision Tree</button>
+        </div>
     </div>
 
   </div>

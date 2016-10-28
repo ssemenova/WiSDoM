@@ -54,18 +54,30 @@ public class Server {
 		post("/sendNumQueries", (req, res) -> sendNumQueries(req, null)); //for slearn
 		post("/sendSLA2", (req, res) -> sendSLA2(req, null));
 
-
 		get("/querytemplates", Server::sendQueryTemplateInfo);
 		get("/querylatency", Server::sendQueryLatencyInfo);
 		post("/slarecs", Server::sendSLARecommendations);
 		post("/slearn", Server::sendSLearnStrategy);
 		post("/heuristics", Server::sendHeuristics);
+		post("/cloudrun", Server::runOnCloud);
 
 		exception(Exception.class, (e, req, res) -> {
 			e.printStackTrace();
 		});
 
 		init();
+	}
+	
+	public static Object runOnCloud(Request req, Response res) {
+		JsonObject data = Json.parse(req.body()).asObject();
+		String sessionID = data.get("sessionID").asString();
+		int slaIdx = data.get("index").asInt();
+		
+		Session s = sessionMap.get(sessionID);
+		s.setSLAIndex(slaIdx);
+		
+		res.type("application/json");
+		return s.getCloudCost();
 	}
 	
 	public static Object sendHeuristics(Request req, Response res) {

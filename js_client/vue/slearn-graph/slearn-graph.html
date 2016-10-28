@@ -8,5 +8,14 @@
       <p align="center">Please wait...</p>
     </div>
     <div id="slearnGraph" v-show="!waiting"></div>
+    <div>
+      <button
+        class="btn btn-primary"
+        v-show="!waiting && (!requestedCloud || waitingOnCloud)"
+        v-on:click="sendToCloud">
+        Run on Cloud
+        <i v-if="requestedCloud && waitingOnCloud" class="fa fa-spinner fa-spin"></i>
+      </button>
+    </div>
   </div>
 </div>

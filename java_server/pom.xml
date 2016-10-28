@@ -47,9 +47,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>edu.brandeis.wisedb</groupId>
+			<groupId>edu.brandeis</groupId>
 			<artifactId>wisedb</artifactId>
-			<version>7.0.0</version>
+			<version>9.2.0</version>
 		</dependency>
 
 		<dependency>

@@ -4,7 +4,11 @@ module.exports = {
     data: function () {
         return {
             strategy: false,
-            waiting: true
+            waiting: true,
+            firstImg: true,
+            lastImg: false,
+            imgNumber: 1,
+            decisionTreePng: './assets/decision-tree/Slide1.png'
         };
     },
 
@@ -19,6 +23,18 @@ module.exports = {
     methods: {
         isSLearn: function() {
             return this.mode == "slearn";
+        },
+        loadNext: function() {
+            if (this.imgNumber <= 16) {
+                this.imgNumber++;
+                this.firstImg = false;
+                if (this.imgNumber == 17) {
+                    this.lastImg = true;
+                }
+                this.decisionTreePng = './assets/decision-tree/Slide' + this.imgNumber + '.png';
+                console.log(this.decisionTreePng);
+                //load previous button doesn't work yet lol
+            }
         }
     },
 

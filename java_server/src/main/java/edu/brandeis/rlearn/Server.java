@@ -43,7 +43,7 @@ public class Server {
 		webSocket("/bandit", BanditWebSocket.class);
 		staticFiles.externalLocation(System.getenv("js_client"));
 
-		WiSeDBUtils.GLPSOL_PATH = System.getenv("glpsol_path");
+//		WiSeDBUtils.GLPSOL_PATH = System.getenv("glpsol_path");
 		
 		defineDefaults();
 

@@ -62,11 +62,11 @@ module.exports = {
                 }).catch((err) => console.log);
         },
 
-        update: function(newSLA) {
+        update: function() {
             this.waiting = true;
             this.waitingOnCloud = true;
             this.requestedCloud = false;
-            axios.post("/heuristics", newSLA)
+            axios.post("/heuristics", this.sla)
                 .then((res) => {
                     this.costs = res.data;
                     this.redrawGraph();
@@ -78,7 +78,7 @@ module.exports = {
     },
 
     watch: {
-        sla: function (newSLA) {
+        sla: function () {
             this.update();
         }
     },

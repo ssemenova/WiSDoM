@@ -52,7 +52,7 @@
             </div>
           </div>
 
-          <button v-on:click="save()" :class="{ 'btn': true, 'btn-primary': true, 'disabled': saved}">
+          <button v-on:click="save()" :class="{ 'btn': true, 'btn-primary': true, 'disabled': saved, 'disabled': !canSave}">
             Save
           </button>
           

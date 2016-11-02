@@ -19,6 +19,10 @@ module.exports = {
     computed: {
         slaSelected: function() {
             return this.correctMode() && this.selectedSLA;
+        },
+
+        canSave: function () {
+            return this.selectedSLA != false && !this.saved;
         }
     },
 

@@ -25,17 +25,7 @@
                 </div>
             </fieldset>
         </form>
-
-        <div v-show="isSLearn && haveTemplates()" class="form-horizontal">
-            <p>Select how many queries of each type to include in the workload.</p>
-                <div class="form-group" v-for="t in templates">
-                    <label class="col-sm-2 control-label">Q{{t}}</label>
-                    <div class="col-sm-10">
-                    <input type="number" class="form-control" v-model="frequencies[t]">
-                </div>
-            </div>
-        </div>
-
+        
         <button v-on:click="save()" :class="{ btn: true, 'btn-primary': true, disabled: saved || !mode}">
             Save
         </button>

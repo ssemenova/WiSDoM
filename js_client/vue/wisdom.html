@@ -16,8 +16,7 @@
     <div class="col-md-6">
       <learning-type :templates="templates"
                      :deadline="deadline"
-                     v-on:mode-changed="modeChanged"
-                     v-on:frequency-changed="frequenciesChanged">
+                     v-on:mode-changed="modeChanged">
       </learning-type>
     </div>
   </div>
@@ -25,7 +24,6 @@
   <div class="row" id="results">
     <div class="col-md-6">
       <sla-recs :templates="templates"
-                :frequencies="frequencies"
                 :mode="mode"
                 :sla="deadline"
                 v-if="mode == 'slearn'"
@@ -33,8 +31,7 @@
       </sla-recs>
 
       <slearn-graph :sla="selectedSLA"
-                    :mode="mode"
-                    v-if="mode == 'slearn'">
+                    v-if="mode == 'slearn' && selectedSLA">
       </slearn-graph>
 
       <rlearn-graph :mode="mode"
@@ -45,8 +42,7 @@
     </div>
     <div class="col-md-6">
       <strategy :sla="selectedSLA"
-                :mode="mode"
-                v-if="mode == 'slearn'">
+                v-if="mode == 'slearn' && selectedSLA">
       </strategy>
 
       <live-display :mode="mode"

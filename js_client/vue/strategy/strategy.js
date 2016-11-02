@@ -12,7 +12,7 @@ module.exports = {
         };
     },
 
-    props: ["sla", "mode"],
+    props: ["sla"],
 
     computed: {
         haveData: function() {
@@ -21,9 +21,7 @@ module.exports = {
     },
 
     methods: {
-        isSLearn: function() {
-            return this.mode == "slearn";
-        },
+
         loadNext: function() {
             if (this.imgNumber <= 16) {
                 this.imgNumber++;
@@ -35,11 +33,10 @@ module.exports = {
                 console.log(this.decisionTreePng);
                 //load previous button doesn't work yet lol
             }
-        }
-    },
+        },
 
-    watch: {
-        sla: function () {
+        checkSLA: function() {
+            console.log("SLA changed!");
             this.waiting = true;
             console.log(JSON.stringify(this.sla));
             axios.post("/slearn", this.sla)
@@ -49,5 +46,15 @@ module.exports = {
                 });
 
         }
+    },
+
+    watch: {
+        sla: function () {
+            this.checkSLA();
+        }
+    },
+
+    created: function () {
+        this.checkSLA();
     }
 };

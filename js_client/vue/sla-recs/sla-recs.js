@@ -7,58 +7,38 @@ module.exports = {
             waiting: true,
             results: false,
             selectedSLA: false,
-            sentRequest: false
+            sentRequest: false,
+            
+            saved: false,
+            frequencies: [5,5,5,5,5,5,5,5,5,5,5]
         };
     },
 
-    props: ["mode", "templates", "frequencies", "sla"],
+    props: ["mode", "templates", "sla"],
 
     computed: {
         slaSelected: function() {
             return this.correctMode() && this.selectedSLA;
-        },
-
-        incorrectModeMsg: function () {
-            if (!this.haveTemplates())
-                return "select templates first";
-
-            if (!this.sla)
-                return "select initial SLA first";
-
-            if (!this.mode || this.mode == "rlearn")
-                return "only available for supervised";
-
-            if (this.frequencies.length == 0)
-                return "set query frequencies first";
-
-            return "";
         }
     },
 
     methods: {
         correctMode: function () {
             return (this.mode == "slearn")
-                && this.haveTemplates()
                 && this.sla != false
                 && this.frequencies.length != 0;
-        },
-
-        haveTemplates: function() {
-            return this.templates.length != 0;
         },
 
         selectSLA: function(idx) {
             if (idx == -1) {
                 // select the original SLA
                 this.selectedSLA = this.results.original;
+                this.selectedSLA.index = -1;
                 return;
             }
 
             this.selectedSLA = this.results.suggestions[idx];
-        },
-
-        clear: function() {
-            this.selectedSLA = false;
+            this.selectedSLA.index = idx;
         },
 
         checkMode: function() {
@@ -67,37 +47,54 @@ module.exports = {
                 this.waiting = true;
                 this.selectedSLA = false;
                 this.sentRequest = false;
-                console.log("mode no good");
+                this.clear();
                 return;
             }
 
-            console.log("mode good!");
-
             if (this.sentRequest)
                 return;
+            
             this.sentRequest = true;
 
             // we are now in the correct mode. send the request...
-            console.log("sending request...");
             axios.post("/slarecs",
                        { "templates": this.templates,
                          "deadline": this.sla,
-                         "frequencies": this.frequencies })
+                         "frequencies": this.getFreqs() })
                 .then(res => {
                     this.waiting = false;
                     this.results = res.data;
                 });
+        },
+
+        getFreqs: function() {
+            return this.frequencies
+                .filter((itm, idx) => this.templates.indexOf(idx) > -1);
+        },
+
+        clear: function() {
+            this.selectedSLA = false;
+            this.saved = false;
+            this.$emit("selected-sla-changed", false);
+            this.$emit("frequency-changed", false);
+        },
+        
+        save: function () {
+            axios.post("/frequency",
+                       {"sessionID": this.selectedSLA.sessionID,
+                        "frequencies": this.getFreqs()})
+                .then(() => {
+                    this.saved = true;
+                    this.$emit("selected-sla-changed", deepcopy(this.selectedSLA));
+                });
+            
         }
     },
 
     watch: {
-        mode: function () { console.log("mode watch!"); this.checkMode(); },
+        mode: function () { this.checkMode(); },
         sla: function() { this.checkMode(); },
-        frequencies: function() { this.checkMode(); },
-        templates: function() { this.checkMode(); },
-        selectedSLA: function() {
-            this.$emit("selected-sla-changed", deepcopy(this.selectedSLA));
-        }
+        templates: function() { this.checkMode(); }
     },
 
     created: function() {

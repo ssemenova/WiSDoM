@@ -35,7 +35,6 @@ module.exports = {
         },
 
         modeChanged: function(m) {
-            console.log("got mode change in main.js");
             this.mode = m;
         },
 
@@ -49,6 +48,7 @@ module.exports = {
         },
 
         selectedSLAChanged: function (sla) {
+            console.log("Got new SLA: " + JSON.stringify(sla));
             this.selectedSLA = sla;
         },
 

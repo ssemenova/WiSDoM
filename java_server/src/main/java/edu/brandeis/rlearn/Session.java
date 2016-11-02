@@ -1,12 +1,11 @@
 package edu.brandeis.rlearn;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.eclipsesource.json.Json;
@@ -29,7 +28,7 @@ import edu.brandeis.wisedb.scheduler.PackNGraphSearch;
  * Created by seaurchi on 9/17/16.
  */
 public class Session {
-    private Set<Integer> templates;
+    private List<Integer> templates;
     private Map<Integer, Integer> queryFreqs;
     private List<RecommendedSLA> recommendations;
     private RecommendedSLA originalSLA;
@@ -59,14 +58,14 @@ public class Session {
     }
 
     public Session() {
-        templates = new HashSet<>();
+        templates = new ArrayList<>();
     }
 
-    public void setTemplates(Set<Integer> templates) {
+    public void setTemplates(List<Integer> templates) {
         this.templates = templates;
     }
 
-    public Set<Integer> getTemplates() {
+    public List<Integer> getTemplates() {
         return templates;
     }
 
@@ -117,9 +116,14 @@ public class Session {
         List<WiSeDBCachedModel> models = AdaptiveModelingUtils.tightenAndRetrain(wf, increment, numSteps, 9, 200);
         List<Integer> cost = new LinkedList<Integer>();
         
+        Map<Integer, Integer> defaultQueryFreqs = new HashMap<>();
+        for (Integer i: getTemplates()) {
+        	defaultQueryFreqs.put(i, 10);
+        }
+        
         for (WiSeDBCachedModel model : models) {
             cost.add(CostUtils.getCostForPlan(model.getWorkloadSpecification(),
-                    WiSeDBUtils.doPlacement(model, queryFreqs)));
+                    WiSeDBUtils.doPlacement(model, defaultQueryFreqs)));
         }
         
         recommendations = new LinkedList<>();
@@ -133,8 +137,8 @@ public class Session {
 
         
         // recost the ones we actually picked with GPLSOL
-        recommendations.forEach(r -> r.recost(queryFreqs));
-        getOriginalSLA().recost(queryFreqs);
+        recommendations.forEach(r -> r.recost(defaultQueryFreqs));
+        getOriginalSLA().recost(defaultQueryFreqs);
         
 //        for (RecommendedSLA recommendation : recommendations) {
 //            recHeuristicCost.put(recommendation, generateHeuristicCharts(recommendation));

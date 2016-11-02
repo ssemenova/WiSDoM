@@ -8,8 +8,8 @@ import static spark.Spark.staticFiles;
 import static spark.Spark.webSocket;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -21,12 +21,12 @@ import java.util.stream.StreamSupport;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 
 import edu.brandeis.wisedb.AdvisorAction;
 import edu.brandeis.wisedb.AdvisorActionAssign;
 import edu.brandeis.wisedb.AdvisorActionProvision;
 import edu.brandeis.wisedb.CostUtils;
-import edu.brandeis.wisedb.WiSeDBUtils;
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
@@ -57,6 +57,7 @@ public class Server {
 		get("/querytemplates", Server::sendQueryTemplateInfo);
 		get("/querylatency", Server::sendQueryLatencyInfo);
 		post("/slarecs", Server::sendSLARecommendations);
+		post("/frequency", Server::sentQueryFrequency);
 		post("/slearn", Server::sendSLearnStrategy);
 		post("/heuristics", Server::sendHeuristics);
 		post("/cloudrun", Server::runOnCloud);
@@ -91,6 +92,25 @@ public class Server {
 		res.type("application/json");
 		return s.generateHeuristicCharts();	
 	}
+	
+	public static Object sentQueryFrequency(Request req, Response res) {
+		JsonObject data = Json.parse(req.body()).asObject();
+
+		String sessionID = data.get("sessionID").asString();
+		Session s = sessionMap.get(sessionID);
+
+		JsonArray freqs = data.get("frequencies").asArray();
+		
+		Map<Integer, Integer> sentFreqs = new HashMap<>();
+		int i = 0;
+		for (JsonValue jv : freqs) {
+			sentFreqs.put(s.getTemplates().get(i), jv.asInt());
+			i++;
+		}
+		
+		s.setQueryFreqs(sentFreqs);
+		return "";
+	}
 
 	public static Object sendSLearnStrategy(Request req, Response res) {
 		JsonObject data = Json.parse(req.body()).asObject();
@@ -115,7 +135,6 @@ public class Server {
 		JsonObject data = Json.parse(req.body()).asObject();
 		
 		JsonArray templates = data.get("templates").asArray();
-		JsonArray freqs = data.get("frequencies").asArray();
 		int deadline = (int) data.get("deadline").asDouble();
 		deadline += 60;
 		deadline *= 1000; // convert from seconds to milis
@@ -128,20 +147,13 @@ public class Server {
 				.map(v -> v.asInt())
 				.collect(Collectors.toList());
 		
-		int idx = 0;
-		Map<Integer, Integer> frequencies = new HashMap<>();
-		for (Integer i : selected) {
-			frequencies.put(i, freqs.get(idx).asInt());
-			idx++;
-		}
 		
-		s.setQueryFreqs(frequencies);
-		s.setTemplates(new HashSet<>(selected));
+		s.setTemplates(selected);
 		s.setLearnType("S");
 		s.addSLA1("deadline", deadline);
 		
 		s.recommendSLA();
-		idx = 0;
+		int idx = 0;
 		for (RecommendedSLA sla : s.getRecommendations()) {
 			suggestions.add(Json.object()
 					.add("index", idx)
@@ -231,7 +243,7 @@ public class Server {
 			return renderFirstPage(req, "You must choose at least one template");
 		}
 
-		session.setTemplates(templatesChosen.keySet());
+		session.setTemplates(new ArrayList<>(templatesChosen.keySet()));
 		model.put("next-Step", "chooseSLA.vm");
 
 		return renderTemplate(model, "chooseSLA.vm");

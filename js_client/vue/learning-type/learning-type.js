@@ -24,18 +24,9 @@ module.exports = {
             this.$emit("mode-changed", false);
         },
 
-        getFreqs: function() {
-            return this.frequencies
-                .filter((itm, idx) => this.templates.indexOf(idx) > -1);
-        },
-
         save: function () {
             this.saved = true;
-            console.log("emitting mode change");
             this.$emit("mode-changed", this.mode);
-            if (this.mode == "slearn")
-                this.$emit("frequency-changed",
-                           this.getFreqs());
            if (this.deadline && this.mode) {
                $("html, body").animate({ scrollTop: $("#results").offset().top }, 900);
            }
@@ -49,7 +40,6 @@ module.exports = {
     watch: {
         templates: function(t) {
             this.saved = false;
-            this.$emit("frequency-changed", []);
         }
     }
 };

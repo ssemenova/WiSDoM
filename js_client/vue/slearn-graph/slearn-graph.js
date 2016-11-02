@@ -15,7 +15,7 @@ module.exports = {
         };
     },
 
-    props: ["mode", "sla"],
+    props: ["sla"],
 
     methods: {
         redrawGraph: function () {
@@ -60,12 +60,9 @@ module.exports = {
                     this.waitingOnCloud = false;
                     this.redrawGraph();
                 }).catch((err) => console.log);
-        }
-        
-    },
+        },
 
-    watch: {
-        sla: function (newSLA) {
+        update: function(newSLA) {
             this.waiting = true;
             this.waitingOnCloud = true;
             this.requestedCloud = false;
@@ -76,7 +73,17 @@ module.exports = {
                     this.waiting = false;
                 });
 
-           
+
         }
+    },
+
+    watch: {
+        sla: function (newSLA) {
+            this.update();
+        }
+    },
+
+    created: function () {
+        this.update();
     }
 };

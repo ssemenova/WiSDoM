@@ -37,3 +37,23 @@
 .list-complete-leave-active {
     position: absolute;
 }
+
+.blink_me {
+  animation: blinker 0.8s linear infinite;
+}
+
+@keyframes blinker {  
+  50% { opacity: 0; }
+}
+
+.ptr {
+    cursor: pointer;
+    padding-right: 20px;
+}
+
+.controls {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}

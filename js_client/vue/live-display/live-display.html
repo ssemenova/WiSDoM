@@ -8,16 +8,31 @@
       <p align="center">Hold on, contacting the cloud...</p>
     </div>
 
+    <div v-if="numVMs != 0" class="controls">
+      <i class="ptr fa fa-play"  v-on:click="play()" v-if="paused"></i>
+      <i class="ptr fa fa-pause" v-on:click="pause()" v-if="!paused"></i>
+      <span class="blink_me" v-if="paused">actions taken: {{ messages }}</span>
+      <span v-if="!paused">actions taken: {{ messages }}</span>
+    </div>
+
     <span v-for="(value, key) in vms">
       <div class="well" v-show="value.shouldDisplay" v-bind:key="key">
         <div class="row">
 	  <div class="col-xs-1">
-            <img :class="'strat-rec-img ' + value.state" width="24px" height="24px" src="assets/server.png"  style="display: inline; vertical-align: bottom;" alt="Virtual machine">
+            <img :class="'strat-rec-img ' + value.state"
+                 width="24px"
+                 height="24px"
+                 src="assets/server.png"
+                 style="display: inline; vertical-align: bottom;"
+                 alt="Virtual machine">
           </div>
           <div class="col-xs-11">
             <ul class="list-inline" style="display: inline; padding-left: 10px;">
               <transition-group name="list-complete" tag="span">
-                <li v-for="q in value.queue" class="list-complete-item" v-bind:key="q.queryID">
+                <li v-for="q in value.queue"
+                    class="list-complete-item"
+                    v-bind:key="q.queryID">
+                  
                   <div :class="'strat-rec-img sphere t' + q.template"
 	               data-toggle="tooltip"
 	               :title="'Query ID: ' + q.queryID">

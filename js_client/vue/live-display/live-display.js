@@ -10,7 +10,9 @@ module.exports = {
     data: function() {
         return {
             vms: {},
-            running: false
+            running: false,
+            paused: false,
+            messages: 0
         };
     },
 
@@ -24,6 +26,26 @@ module.exports = {
     },
 
     methods: {
+
+        pause: function() {
+            if (!socket) return;
+            var msg = {
+                type: "pause"
+            };
+            socket.send(JSON.stringify(msg));
+            this.paused = true;
+        },
+
+        play: function() {
+            if (!socket) return;
+            var msg = {
+                type: "play"
+            };
+            socket.send(JSON.stringify(msg));
+            this.paused = false;
+        },
+
+        
         provisionVM: function (vmID, vmType) {
             this.$set(this.vms, vmID, {"id": vmID,
                                        "state": "starting",
@@ -86,6 +108,7 @@ module.exports = {
 
             socket.onmessage = (event) => {
                 let data = event.data;
+                this.messages += 1;
                 data = JSON.parse(data);
                 const msgType = data["type"];
                 switch (msgType) {

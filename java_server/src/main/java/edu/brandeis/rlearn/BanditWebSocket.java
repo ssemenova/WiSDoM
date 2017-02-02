@@ -72,7 +72,12 @@ public class BanditWebSocket implements WebSocketListener, BanditDBSimulatorList
 						deadline);
 				sim.addListener(this);
 				sim.start();
+			} else if (json.getString("type").equals("pause")) {
+				sim.pause();
+			} else if (json.getString("type").equals("play")) {
+				sim.resume();
 			}
+
 		} catch (JSONException e) {
 			//TODO: fuck java
 			e.printStackTrace();

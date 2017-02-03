@@ -15,6 +15,42 @@
       <span v-if="!paused">actions taken: {{ messages }}</span>
     </div>
 
+
+    
+
+    <div id="expModal" class="modal fade" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Experience for VM</h4>
+          </div>
+          <div class="modal-body">
+            <p>Here's the experience data for this bandit.</p>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Tables used</th><th>Table scans</th>
+                  <th>Joins</th><th>Cache reads</th><th>Cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="exps in experience">
+                  <td v-for="f in exps">
+                    {{ f }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    
+
     <span v-for="(value, key) in vms">
       <div class="well" v-show="value.shouldDisplay" v-bind:key="key">
         <div class="row">
@@ -24,7 +60,8 @@
                  height="24px"
                  src="assets/server.png"
                  style="display: inline; vertical-align: bottom;"
-                 alt="Virtual machine">
+                 alt="Virtual machine"
+                 v-on:click="showExperience(key)">
           </div>
           <div class="col-xs-11">
             <ul class="list-inline" style="display: inline; padding-left: 10px;">

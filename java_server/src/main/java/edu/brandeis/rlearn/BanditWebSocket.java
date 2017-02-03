@@ -5,17 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.amazonaws.util.json.JSONArray;
-import com.amazonaws.util.json.JSONException;
-import com.amazonaws.util.json.JSONObject;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketListener;
 
+import com.amazonaws.util.json.JSONArray;
+import com.amazonaws.util.json.JSONException;
+import com.amazonaws.util.json.JSONObject;
 import com.eclipsesource.json.Json;
 
 import edu.brandeis.wisedb.rlearn.BanditDBSimulator;
 import edu.brandeis.wisedb.rlearn.BanditDBSimulatorListener;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 
 public class BanditWebSocket implements WebSocketListener, BanditDBSimulatorListener {
 
@@ -76,9 +75,26 @@ public class BanditWebSocket implements WebSocketListener, BanditDBSimulatorList
 				sim.pause();
 			} else if (json.getString("type").equals("play")) {
 				sim.resume();
+			} else if (json.getString("type").equals("features")) {
+				List<List<String>> experience = sim.getFeatures(json.getInt("id"));
+				JSONObject toR = new JSONObject();
+				JSONArray lst = new JSONArray();
+				
+				for (List<String> m : experience) {
+					JSONArray jo = new JSONArray();
+					for (String s : m) {
+						jo.put(s);
+					}
+					
+					lst.put(jo);
+				}
+				
+				toR.put("experience", lst);
+				toR.put("type", "features");
+				s.getRemote().sendString(toR.toString());
 			}
 
-		} catch (JSONException e) {
+		} catch (JSONException | IOException e) {
 			//TODO: fuck java
 			e.printStackTrace();
 		}

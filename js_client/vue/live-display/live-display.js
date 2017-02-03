@@ -12,7 +12,8 @@ module.exports = {
             vms: {},
             running: false,
             paused: false,
-            messages: 0
+            messages: 0,
+            experience: [[]]
         };
     },
 
@@ -53,6 +54,15 @@ module.exports = {
                                        "type": vmType,
                                        "offAt": false,
                                        "shouldDisplay": true});
+        },
+
+        showExperience: function(vmID) {
+            let msg = {
+                "type": "features",
+                "id": vmID
+            };
+            socket.send(JSON.stringify(msg));
+            console.log("send feature!");
         },
 
         markVMReady: function (vmID) {
@@ -130,6 +140,13 @@ module.exports = {
                 case "cost":
                     this.noteCost(data.tick, data.cost);
                     break;
+                case "features":
+                    this.experience = data["experience"];
+                    $("#expModal").modal('show');
+                    console.log(JSON.stringify(this.experience));
+                    break;
+                default:
+                    console.log("got unknown message: " + JSON.stringify(data));
                 }
 
             };

@@ -84,6 +84,7 @@ module.exports = {
         },
         
         save: function () {
+            console.log("Session ID for frequency request: " + this.selectedSLA.sessionID);
             axios.post("/frequency",
                        {"sessionID": this.selectedSLA.sessionID,
                         "frequencies": this.getFreqs()})

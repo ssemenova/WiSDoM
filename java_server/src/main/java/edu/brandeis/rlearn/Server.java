@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import com.amazonaws.util.json.JSONObject;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
@@ -90,7 +91,11 @@ public class Server {
 		s.setSLAIndex(slaIdx);
 		
 		res.type("application/json");
-		return s.generateHeuristicCharts();	
+		
+		JsonObject toR = s.generateHeuristicCharts();
+		
+		
+		return toR;
 	}
 	
 	public static Object sentQueryFrequency(Request req, Response res) {
@@ -100,7 +105,7 @@ public class Server {
 		Session s = sessionMap.get(sessionID);
 
 		JsonArray freqs = data.get("frequencies").asArray();
-		
+				
 		Map<Integer, Integer> sentFreqs = new HashMap<>();
 		int i = 0;
 		for (JsonValue jv : freqs) {

@@ -203,39 +203,39 @@ public class Session {
 
 	public JsonObject generateHeuristicCharts() {
 		RecommendedSLA SLA = this.getSelectedSLA();
-	    if (recHeuristicCost.containsKey(SLA)) {
-	        return recHeuristicCost.get(SLA);
-        } else {  
-            System.out.println("Created sample workload");
+		// can't cache based on the selected SLA because it doesn't contain query frequency numbers
+		//	    if (recHeuristicCost.containsKey(SLA)) {
+		//	        return recHeuristicCost.get(SLA);
+		//        } else {  
 
-            int ffd, ffi, pack9;
-            
-            WorkloadSpecification wf = this.getSelectedSLA().getModel().getWorkloadSpecification();
-            
-            GraphSearcher ffdSearch = new FirstFitDecreasingGraphSearch(wf.getSLA(), wf.getQueryTimePredictor(), false);
-            GraphSearcher ffiSearch = new FirstFitDecreasingGraphSearch(wf.getSLA(), wf.getQueryTimePredictor(), true);
-            GraphSearcher pack9Search = new PackNGraphSearch(9, wf.getQueryTimePredictor(), wf.getSLA());
+		int ffd, ffi, pack9;
 
-            ffd = CostUtils.getCostForSearcher(ffdSearch, wf, queryFreqs);
-            ffi = CostUtils.getCostForSearcher(ffiSearch, wf, queryFreqs);
-            pack9 = CostUtils.getCostForSearcher(pack9Search, wf, queryFreqs);
+		WorkloadSpecification wf = this.getSelectedSLA().getModel().getWorkloadSpecification();
 
-            JsonObject toR = Json.object();
-            toR.add("ffd", ffd/10.0);
-            toR.add("ffi", ffi/10.0);
-            toR.add("pack9", pack9/10.0);
-            toR.add("wisedb", (int)(CostUtils.getCostForPlan(getSelectedSLA().getModel().getWorkloadSpecification(), doPlacementWithSelected())/10.0));
-            recHeuristicCost.put(SLA, toR);
-            
-            return toR;
-        }
+		GraphSearcher ffdSearch = new FirstFitDecreasingGraphSearch(wf.getSLA(), wf.getQueryTimePredictor(), false);
+		GraphSearcher ffiSearch = new FirstFitDecreasingGraphSearch(wf.getSLA(), wf.getQueryTimePredictor(), true);
+		GraphSearcher pack9Search = new PackNGraphSearch(9, wf.getQueryTimePredictor(), wf.getSLA());
 
-    }
+		ffd = CostUtils.getCostForSearcher(ffdSearch, wf, queryFreqs);
+		ffi = CostUtils.getCostForSearcher(ffiSearch, wf, queryFreqs);
+		pack9 = CostUtils.getCostForSearcher(pack9Search, wf, queryFreqs);
+
+		JsonObject toR = Json.object();
+		toR.add("ffd", ffd/10.0);
+		toR.add("ffi", ffi/10.0);
+		toR.add("pack9", pack9/10.0);
+		toR.add("wisedb", (int)(CostUtils.getCostForPlan(getSelectedSLA().getModel().getWorkloadSpecification(), doPlacementWithSelected())/10.0));
+		recHeuristicCost.put(SLA, toR);
+
+		return toR;
+		//}
+
+	}
 
 	public JsonObject getCloudCost() {
 		JsonObject toR = Json.object();
 		int wiseCost = (int)(CostUtils.getCostForPlan(getSelectedSLA().getModel().getWorkloadSpecification(), doPlacementWithSelected())/10.0);
-		double cloudCost = ((new Random()).nextDouble() - 0.5) + wiseCost;
+		double cloudCost = (((new Random()).nextDouble() * 0.8) - 0.5) + wiseCost;
 		toR.add("actualCost", cloudCost);
 		
 		try {

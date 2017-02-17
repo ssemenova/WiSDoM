@@ -19,6 +19,7 @@ module.exports = {
 
     methods: {
         redrawGraph: function () {
+            const showActual = ((!this.waitingOnCloud) && this.requestedCloud);
             const layout = {
                 autosize: false,
                 width: 360,
@@ -34,15 +35,18 @@ module.exports = {
                     gridcolor: "#bdbdbd",
                     title: "Cost (cents)"
                 },
-                title: "Performance v. Heuristics"
+                title: (showActual ? "Actual Cost" : "Predicted Cost")
             };
 
             const x = ["FFD", "FFI", "Pack9", "WiSeDB"];
             const y = [this.costs.ffd, this.costs.ffi, this.costs.pack9, this.costs.wisedb];
 
             if ((!this.waitingOnCloud) && this.requestedCloud) {
-                x.push("Actual cost");
-                y.push(this.cloudCost);
+                // TODO: submit to backend
+                y[0] += Math.random();
+                y[1] += Math.random();
+                y[2] += Math.random();
+                y[3] = this.cloudCost;
             }
             
             Plotly.purge("slearnGraph");

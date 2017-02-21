@@ -15,6 +15,7 @@ module.exports = {
             mode: false,
             deadline: false,
             selectedSLA: false,
+            slaType: "Max",
             rlearnData: []
         };
     },
@@ -54,6 +55,10 @@ module.exports = {
 
         gotRLearnData: function (dataPoint) {
             this.rlearnData.push(dataPoint);
+        },
+
+        slaTypeChanged: function (t) {
+            this.slaType = t;
         }
     }
 

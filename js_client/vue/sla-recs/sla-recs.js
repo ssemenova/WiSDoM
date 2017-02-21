@@ -14,7 +14,7 @@ module.exports = {
         };
     },
 
-    props: ["mode", "templates", "sla"],
+    props: ["mode", "templates", "sla", "slaType"],
 
     computed: {
         slaSelected: function() {
@@ -93,6 +93,10 @@ module.exports = {
                     this.$emit("selected-sla-changed", deepcopy(this.selectedSLA));
                 });
             
+        },
+
+        isPerQuery: function () {
+            return this.slaType == "Per Query";
         }
     },
 

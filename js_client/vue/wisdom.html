@@ -9,7 +9,8 @@
     <div class="col-md-6">
       <sla-selection :templates="templates"
                      :mode="mode"
-                     v-on:deadline-changed="deadlineChanged">
+                     v-on:deadline-changed="deadlineChanged"
+                     v-on:sla-type-changed="slaTypeChanged">
       </sla-selection>
     </div>
 
@@ -26,6 +27,7 @@
       <sla-recs :templates="templates"
                 :mode="mode"
                 :sla="deadline"
+                :sla-type="slaType"
                 v-if="mode == 'slearn'"
                 v-on:selected-sla-changed="selectedSLAChanged">
       </sla-recs>

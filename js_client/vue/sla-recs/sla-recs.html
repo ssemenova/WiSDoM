@@ -28,13 +28,17 @@
 	    <tbody>
 	      <tr :class="{'success': selectedSLA.index == -1}">
 		<td>1</td>
-		<td>{{ results.original.deadline - 60 }} seconds</td>
+                
+		<td v-if="!isPerQuery()">{{ results.original.deadline - 60 }} seconds</td>
+                <td v-if="isPerQuery()">Original deadline</td>
+                
 		<td>{{ results.original.cost }} cents</td>
 		<td><button :class="{'btn': true, 'btn-primary': true, 'disabled': saved}" v-on:click="selectSLA(-1)">Use Original SLA</button>
 	      </tr>
 	      <tr v-for="r in results.suggestions" :class="{'success': selectedSLA.index == r.index}">
 		<td>{{ r.index + 2}}</td>
-		<td>{{ r.deadline - 60}} seconds</td>
+		<td v-if="!isPerQuery()">{{ r.deadline - 60}} seconds</td>
+                <td v-if="isPerQuery()">{{ (r.deadline - 60) * (4.0/25.0) }}x multipler</td>
 		<td>{{ r.cost }} cents</td>
 		<td><button :class="{'btn': true, 'btn-default': true, 'disabled': saved}" v-on:click="selectSLA(r.index)">Use Suggested SLA</button></td>
 	      </tr>

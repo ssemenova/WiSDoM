@@ -178,7 +178,7 @@ module.exports = {
     mounted: function () {
         nouislider.create(this.$el, {
             start: [ 20 ],
-            step: 1,
+            step: 0.25,
             range: {
                 'min': [ parseInt(this.minValue) ],
                 'max': [ parseInt(this.maxValue) ]

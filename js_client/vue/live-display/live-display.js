@@ -89,7 +89,7 @@ module.exports = {
             }
         },
 
-        noteCost: function (tick, cost) {
+        noteCost: function (tick, cost, clairvoyant) {
             // check for off VMs...
             for (let vmID in this.vms) {
                 if (this.vms[vmID].state == "off") {
@@ -102,7 +102,8 @@ module.exports = {
                     }
                 }
             }
-            this.$emit("rlearn-cost-update", {tick, cost});
+
+            this.$emit("rlearn-cost-update", {tick, cost, clairvoyant});
         },
 
         start: function() {
@@ -138,7 +139,10 @@ module.exports = {
                     this.shutdownVM(data.vmID);
                     break;
                 case "cost":
-                    this.noteCost(data.tick, data.cost);
+                    this.noteCost(data.tick, data.cost, false);
+                    break;
+                case "clairvoyantCost":
+                    this.noteCost(data.tick, data.cost, true);
                     break;
                 case "features":
                     this.experience = data["experience"];

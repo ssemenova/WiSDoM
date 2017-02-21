@@ -185,4 +185,19 @@ public class BanditWebSocket implements WebSocketListener, BanditDBSimulatorList
 		
 	}
 
+	@Override
+	public void clairvoyantCostPerQuery(long cost, long currTick) {
+		try {
+			s.getRemote().sendString(Json.object()
+					.add("type", "clairvoyantCost")
+					.add("cost", cost + 500)
+					.add("tick", currTick)
+					.toString());
+		} catch (IOException e) {
+			// TODO
+			e.printStackTrace();
+		}
+		
+	}
+
 }

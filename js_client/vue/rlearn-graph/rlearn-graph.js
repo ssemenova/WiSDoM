@@ -21,8 +21,8 @@ module.exports = {
         redrawGraph: function () {
             const layout = {
                 autosize: false,
-                width: 400,
-                height: 360,
+                width: 450,
+                height: 400,
                 margin: {
                     b: 80,
                     l: 80,
@@ -44,14 +44,23 @@ module.exports = {
             const x = [];
             const y = [];
 
+            const x2 = [];
+            const y2 = [];
+
             for (let v of this.rlearnData) {
-                x.push(v.tick/100);
-                y.push(v.cost);
+                if (!v.clairvoyant) {
+                    x.push(v.tick/100);
+                    y.push(v.cost);
+                } else {
+                    x2.push(v.tick/100);
+                    y2.push(v.cost);
+                }
             }
             
             Plotly.purge("rlearnGraph");
             Plotly.newPlot("rlearnGraph",
-                           [{x, y, type: "scatter", name: "Cost"}],
+                           [{x, y, type: "scatter", name: "RLearn"},
+                            {x: x2, y: y2, type: "scatter", name: "Clairvoyant"}],
                            layout, {displayModeBar: false});
         }
     },

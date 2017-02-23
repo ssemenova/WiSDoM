@@ -39,7 +39,7 @@ module.exports = {
 
     watch: {
         templates: function(t) {
-            this.saved = false;
+            this.clear();
         }
     }
 };

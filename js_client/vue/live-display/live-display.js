@@ -169,13 +169,15 @@ module.exports = {
                 this.start();
             } else {
                 this.stop();
+                this.messages = 0;
             }
         }
     },
 
     watch: {
         mode: function () { this.startIfCorrectMode(); },
-        sla: function () { this.startIfCorrectMode(); }
+        sla: function () { this.startIfCorrectMode(); },
+        templates: function() { this.startIfCorrectMode(); }
     },
 
     mounted: function() { this.startIfCorrectMode(); },

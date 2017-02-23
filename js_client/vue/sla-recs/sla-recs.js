@@ -9,7 +9,6 @@ module.exports = {
             selectedSLA: false,
             sentRequest: false,
             
-            saved: false,
             frequencies: [5,5,5,5,5,5,5,5,5,5,5]
         };
     },
@@ -22,11 +21,21 @@ module.exports = {
         },
 
         canSave: function () {
-            return this.selectedSLA != false && !this.saved;
+            return this.selectedSLA != false;
         }
     },
 
     methods: {
+        validateFreq: function(idx) {
+            return (/^[0-9]+$/.test(this.frequencies[idx]));
+        },
+
+        validateAll: function(idx) {
+            return this.frequencies.every((i, idx) => {
+                return this.validateFreq(idx);
+            });
+        },
+        
         correctMode: function () {
             return (this.mode == "slearn")
                 && this.sla != false
@@ -38,11 +47,13 @@ module.exports = {
                 // select the original SLA
                 this.selectedSLA = this.results.original;
                 this.selectedSLA.index = -1;
+                this.save();
                 return;
             }
 
             this.selectedSLA = this.results.suggestions[idx];
             this.selectedSLA.index = idx;
+            this.save();
         },
 
         checkMode: function() {
@@ -57,7 +68,7 @@ module.exports = {
 
             if (this.sentRequest)
                 return;
-            
+
             this.sentRequest = true;
 
             // we are now in the correct mode. send the request...
@@ -68,6 +79,7 @@ module.exports = {
                 .then(res => {
                     this.waiting = false;
                     this.results = res.data;
+                    this.selectSLA(-1);
                 });
         },
 
@@ -78,18 +90,18 @@ module.exports = {
 
         clear: function() {
             this.selectedSLA = false;
-            this.saved = false;
             this.$emit("selected-sla-changed", false);
             this.$emit("frequency-changed", false);
         },
         
         save: function () {
-            console.log("Session ID for frequency request: " + this.selectedSLA.sessionID);
+            if (!this.validateAll())
+                return;
+            
             axios.post("/frequency",
                        {"sessionID": this.selectedSLA.sessionID,
                         "frequencies": this.getFreqs()})
                 .then(() => {
-                    this.saved = true;
                     this.$emit("selected-sla-changed", deepcopy(this.selectedSLA));
                 });
             
@@ -103,7 +115,8 @@ module.exports = {
     watch: {
         mode: function () { this.checkMode(); },
         sla: function() { this.checkMode(); },
-        templates: function() { this.checkMode(); }
+        templates: function() { this.checkMode(); },
+        frequencies: function() { this.save(); }
     },
 
     created: function() {

@@ -13,7 +13,8 @@ module.exports = {
             running: false,
             paused: false,
             messages: 0,
-            experience: [[]]
+            experience: [[]],
+            queriesProcessed: 0
         };
     },
 
@@ -87,9 +88,11 @@ module.exports = {
                 this.vms[k].queue = this.vms[k].queue
                     .filter(q => q.queryID != queryID);
             }
+
+            this.queriesProcessed++;
         },
 
-        noteCost: function (tick, cost, clairvoyant) {
+        noteCost: function (tick, cost, penalty, clairvoyant) {
             // check for off VMs...
             for (let vmID in this.vms) {
                 if (this.vms[vmID].state == "off") {
@@ -103,7 +106,26 @@ module.exports = {
                 }
             }
 
-            this.$emit("rlearn-cost-update", {tick, cost, clairvoyant});
+            this.$emit("rlearn-cost-update", {tick, cost, clairvoyant,
+                                              penalty});
+        },
+
+        updateStats: function() {
+            let running = 0;
+            let booting = 0;
+            for (let vmID in this.vms) {
+                if (this.vms[vmID].state == "running")
+                    running++;
+
+                if (this.vms[vmID].state == "starting")
+                    booting++;
+            }
+
+            this.$emit("running-vm-count",
+                       {running,
+                        booting,
+                        "queriesProcessed": this.queriesProcessed});
+            
         },
 
         start: function() {
@@ -139,21 +161,24 @@ module.exports = {
                     this.shutdownVM(data.vmID);
                     break;
                 case "cost":
-                    this.noteCost(data.tick, data.cost, false);
+                    this.noteCost(data.tick, data.cost, data.penalty, false);
                     break;
                 case "clairvoyantCost":
-                    this.noteCost(data.tick, data.cost, true);
+                    this.noteCost(data.tick, data.cost, data.penalty, true);
                     break;
                 case "features":
                     this.experience = data["experience"];
                     $("#expModal").modal('show');
-                    console.log(JSON.stringify(this.experience));
                     break;
                 default:
                     console.log("got unknown message: " + JSON.stringify(data));
                 }
 
+                this.updateStats();
+
             };
+
+            console.log("setting running to true...");
             this.running = true;
         },
 
@@ -165,6 +190,7 @@ module.exports = {
         },
 
         startIfCorrectMode: function () {
+            console.log("checking mode: " + this.mode + ", " + this.sla);
             if (this.mode == "rlearn" && this.sla != false) {
                 this.start();
             } else {

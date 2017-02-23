@@ -16,7 +16,8 @@ module.exports = {
             deadline: false,
             selectedSLA: false,
             slaType: "Max",
-            rlearnData: []
+            rlearnData: [],
+            runningVMs: 0
         };
     },
 
@@ -59,6 +60,11 @@ module.exports = {
 
         slaTypeChanged: function (t) {
             this.slaType = t;
+        },
+
+        runningVMCount: function (c) {
+            console.log("Got new running VM count!");
+            this.runningVMs = c;
         }
     }
 

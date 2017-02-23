@@ -118,7 +118,7 @@ public class BanditWebSocket implements WebSocketListener, BanditDBSimulatorList
 	}
 
 	@Override
-	public void queryComplete(int qID) {
+	public void queryComplete(int qID, int penalty) {
 		try {
 			s.getRemote().sendString(Json.object()
 					.add("type", "complete")
@@ -171,11 +171,12 @@ public class BanditWebSocket implements WebSocketListener, BanditDBSimulatorList
 	}
 
 	@Override
-	public void costPerQuery(long cost, long currTick) {
+	public void costPerQuery(long cost, long penalty, long currTick) {
 		try {
 			s.getRemote().sendString(Json.object()
 					.add("type", "cost")
 					.add("cost", cost)
+					.add("penalty", penalty)
 					.add("tick", currTick)
 					.toString());
 		} catch (IOException e) {
@@ -186,11 +187,12 @@ public class BanditWebSocket implements WebSocketListener, BanditDBSimulatorList
 	}
 
 	@Override
-	public void clairvoyantCostPerQuery(long cost, long currTick) {
+	public void clairvoyantCostPerQuery(long cost, long penalty, long currTick) {
 		try {
 			s.getRemote().sendString(Json.object()
 					.add("type", "clairvoyantCost")
 					.add("cost", cost + 500)
+					.add("penalty", penalty)
 					.add("tick", currTick)
 					.toString());
 		} catch (IOException e) {

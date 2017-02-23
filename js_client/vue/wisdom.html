@@ -59,7 +59,8 @@
     <div class="col-md-6">
 
       <rlearn-graph :mode="mode"
-                    :rlearn-data="rlearnData">
+                    :rlearn-data="rlearnData"
+                    :stats="runningVMs">
       </rlearn-graph>
 
     </div>
@@ -67,8 +68,8 @@
       <live-display :mode="mode"
                     :sla="deadline"
                     :templates="templates"
-                    v-on:rlearn-cost-update="gotRLearnData">
-
+                    v-on:rlearn-cost-update="gotRLearnData"
+                    v-on:running-vm-count="runningVMCount">
       </live-display>
     </div>
   </div>

@@ -3,14 +3,22 @@
         <h3 class="panel-title">Performance</h3>
     </div>
     <div class="panel-body">
-        <div class="row">
-            <div class="col-xs-12">
-                <div v-show="!haveData()">
-                    <p align="center"><i class="fa fa-spinner fa-spin fa-3x"></i></p>
-                    <p align="center">Waiting for data...</p>
-                </div>
-                <div id="rlearnGraph" v-show="haveData()"></div>
-            </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <div v-show="!haveData()">
+            <p align="center"><i class="fa fa-spinner fa-spin fa-3x"></i></p>
+            <p align="center">Waiting for data...</p>
+          </div>
+          <div id="rlearnGraph" v-show="haveData()"></div>
+          <div id="rlearnGraphPenalty" v-show="haveData()"></div>
+          <dl class="dl-horizontal">
+            <dt>Running VMs</dt> <dd>{{stats.running}}</dd>
+            <dt>Booting VMs</dt> <dd>{{stats.booting}}</dd>
+            <dt>Queries processed</dt> <dd>{{stats.queriesProcessed}}</dd>
+            <!--<dt>Penalty</dt> <dd>{{stats.penalty}}</dd>
+            <dt>Clairvoyant Penalty</dt> <dd>{{stats.clairvoyantPenalty}}</dd>-->
+          </dl>
         </div>
+      </div>
     </div>
 </div>

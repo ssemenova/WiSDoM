@@ -23,29 +23,31 @@
   </div>
 
   <div class="row" id="results" v-if="mode == 'slearn' && deadline">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">
-          Strategy
-        </h3>
-      </div>
-      <div class="panel-body">
-        <div class="row">
-          <div class="col-md-6">
-            <sla-recs :templates="templates"
-                      :mode="mode"
-                      :sla="deadline"
-                      :sla-type="slaType"
-                      v-on:selected-sla-changed="selectedSLAChanged">
-            </sla-recs>
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            Strategy
+          </h3>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-6">
+              <sla-recs :templates="templates"
+                        :mode="mode"
+                        :sla="deadline"
+                        :sla-type="slaType"
+                        v-on:selected-sla-changed="selectedSLAChanged">
+              </sla-recs>
+              
+              <slearn-graph :sla="selectedSLA">
+              </slearn-graph>
+            </div>
             
-            <slearn-graph :sla="selectedSLA">
-            </slearn-graph>
-          </div>
-          
-          <div class="col-md-6">
-            <strategy :sla="selectedSLA">
-            </strategy>
+            <div class="col-md-6">
+              <strategy :sla="selectedSLA">
+              </strategy>
+            </div>
           </div>
         </div>
       </div>

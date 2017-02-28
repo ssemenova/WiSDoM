@@ -36,6 +36,11 @@ module.exports = {
 
         checkSLA: function() {
             this.waiting = true;
+            if (!this.sla) {
+                this.strategy = false;
+                return;
+            }
+
             axios.post("/slearn", this.sla)
                 .then(res => {
                     this.strategy = res.data.schedule;
@@ -47,6 +52,7 @@ module.exports = {
 
     watch: {
         sla: function () {
+            console.log("got an sla change: " + JSON.stringify(this.sla));
             this.checkSLA();
         }
     },
@@ -54,4 +60,5 @@ module.exports = {
     created: function () {
         this.checkSLA();
     }
+
 };

@@ -125,11 +125,13 @@ module.exports = {
     watch: {
         mode: function () { this.checkMode(); },
         sla: function() { this.checkMode(); },
-        templates: function() { this.checkMode(); }
+        templates: function() { this.checkMode(); },
+        slaType: function() { this.checkMode(); }
 
     },
 
     created: function() {
+        this.clear();
         this.checkMode();
 
         // for some reason using the regular watch doesn't work...

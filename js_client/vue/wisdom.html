@@ -41,13 +41,13 @@
             </sla-recs>
             
             <slearn-graph :sla="selectedSLA"
-                          v-if="mode == 'slearn' && selectedSLA">
+                          v-if="mode == 'slearn'">
             </slearn-graph>
           </div>
           
           <div class="col-md-6">
             <strategy :sla="selectedSLA"
-                      v-if="mode == 'slearn' && selectedSLA">
+                      v-if="mode == 'slearn'">
             </strategy>
           </div>
         </div>

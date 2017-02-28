@@ -36,18 +36,15 @@
                       :mode="mode"
                       :sla="deadline"
                       :sla-type="slaType"
-                      v-if="mode == 'slearn'"
                       v-on:selected-sla-changed="selectedSLAChanged">
             </sla-recs>
             
-            <slearn-graph :sla="selectedSLA"
-                          v-if="mode == 'slearn'">
+            <slearn-graph :sla="selectedSLA">
             </slearn-graph>
           </div>
           
           <div class="col-md-6">
-            <strategy :sla="selectedSLA"
-                      v-if="mode == 'slearn'">
+            <strategy :sla="selectedSLA">
             </strategy>
           </div>
         </div>

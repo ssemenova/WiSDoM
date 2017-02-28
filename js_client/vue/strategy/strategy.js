@@ -37,12 +37,15 @@ module.exports = {
         checkSLA: function() {
             this.waiting = true;
             if (!this.sla) {
+                console.log("sla is false, clearing!");
                 this.strategy = false;
                 return;
             }
 
+            console.log("sending request...");
             axios.post("/slearn", this.sla)
                 .then(res => {
+                    console.log("got response");
                     this.strategy = res.data.schedule;
                     this.waiting = false;
                 });
@@ -55,10 +58,6 @@ module.exports = {
             console.log("got an sla change: " + JSON.stringify(this.sla));
             this.checkSLA();
         }
-    },
-
-    created: function () {
-        this.checkSLA();
     }
 
 };

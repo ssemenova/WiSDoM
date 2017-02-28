@@ -50,7 +50,6 @@ module.exports = {
         },
 
         selectedSLAChanged: function (sla) {
-            console.log("Got new SLA: " + JSON.stringify(sla));
             this.selectedSLA = sla;
         },
 

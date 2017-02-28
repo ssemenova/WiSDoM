@@ -9,7 +9,7 @@ module.exports = {
             selectedSLA: false,
             sentRequest: false,
             
-            frequencies: [5,5,5,5,5,5,5,5,5,5,5]
+            frequencies: {"1": 5, "2": 5, "3": 5, "4": 5, "5": 5}
         };
     },
 
@@ -30,8 +30,8 @@ module.exports = {
             return (/^[0-9]+$/.test(this.frequencies[idx]));
         },
 
-        validateAll: function(idx) {
-            return this.frequencies.every((i, idx) => {
+        validateAll: function() {
+            return [1,2,3,4,5].every((idx) => {
                 return this.validateFreq(idx);
             });
         },
@@ -84,8 +84,16 @@ module.exports = {
         },
 
         getFreqs: function() {
-            return this.frequencies
-                .filter((itm, idx) => this.templates.indexOf(idx) > -1);
+            const toR = [];
+            for (let i = 1; i <= 5; i++) {
+                if (this.templates.indexOf(i) == -1)
+                    continue;
+
+                toR.push(parseInt(this.frequencies[i]));
+            }
+
+
+            return toR;
         },
 
         clear: function() {
@@ -97,6 +105,8 @@ module.exports = {
         save: function () {
             if (!this.validateAll())
                 return;
+
+            console.log("freqs: " + JSON.stringify(this.getFreqs()));
             
             axios.post("/frequency",
                        {"sessionID": this.selectedSLA.sessionID,
@@ -115,12 +125,17 @@ module.exports = {
     watch: {
         mode: function () { this.checkMode(); },
         sla: function() { this.checkMode(); },
-        templates: function() { this.checkMode(); },
-        frequencies: function() { this.save(); }
+        templates: function() { this.checkMode(); }
+
     },
 
     created: function() {
         this.checkMode();
+
+        // for some reason using the regular watch doesn't work...
+        this.$watch("frequencies", function(oldV, newV) {
+            this.save();
+        }, {deep: true});
     }
 
 

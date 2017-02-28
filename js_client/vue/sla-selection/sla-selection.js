@@ -71,7 +71,6 @@ module.exports = {
                 Plotly.deleteTraces(plt, 30);
                 let y = [];
                 if (this.SLAType != "Per Query") {
-                    console.log("not per q");
                     y = x.map(x => this.deadline);
                 } else {
                     const ourLatencies = [];
@@ -89,7 +88,6 @@ module.exports = {
                             / 1000;
                     });
 
-                    console.log(JSON.stringify(y));
                 }
 
                 Plotly.addTraces(plt,
@@ -203,7 +201,6 @@ module.exports = {
             this.$emit("deadline-changed", false);
         },
         SLAType: function(v) {
-            console.log("SLA type change!");
             this.redrawGraph();
             this.saved = false;
             this.$emit("deadline-changed", false);

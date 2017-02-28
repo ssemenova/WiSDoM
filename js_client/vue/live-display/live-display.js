@@ -63,7 +63,6 @@ module.exports = {
                 "id": vmID
             };
             socket.send(JSON.stringify(msg));
-            console.log("send feature!");
         },
 
         markVMReady: function (vmID) {
@@ -178,7 +177,6 @@ module.exports = {
 
             };
 
-            console.log("setting running to true...");
             this.running = true;
         },
 
@@ -190,7 +188,6 @@ module.exports = {
         },
 
         startIfCorrectMode: function () {
-            console.log("checking mode: " + this.mode + ", " + this.sla);
             if (this.mode == "rlearn" && this.sla != false) {
                 this.start();
             } else {

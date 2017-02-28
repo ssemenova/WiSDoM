@@ -30,15 +30,12 @@ module.exports = {
                     this.lastImg = true;
                 }
                 this.decisionTreePng = './assets/decision-tree/Slide' + this.imgNumber + '.png';
-                console.log(this.decisionTreePng);
                 //load previous button doesn't work yet lol
             }
         },
 
         checkSLA: function() {
-            console.log("SLA changed!");
             this.waiting = true;
-            console.log(JSON.stringify(this.sla));
             axios.post("/slearn", this.sla)
                 .then(res => {
                     this.strategy = res.data.schedule;

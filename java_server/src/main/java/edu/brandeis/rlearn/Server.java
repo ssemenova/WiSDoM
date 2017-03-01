@@ -7,6 +7,10 @@ import static spark.Spark.post;
 import static spark.Spark.staticFiles;
 import static spark.Spark.webSocket;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import com.amazonaws.util.json.JSONObject;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
@@ -57,6 +60,8 @@ public class Server {
 
 		get("/querytemplates", Server::sendQueryTemplateInfo);
 		get("/querylatency", Server::sendQueryLatencyInfo);
+		post("/tree", Server::getDecisionTree);
+		get("/tree/:session", Server::getDecisionTreeImage);
 		post("/slarecs", Server::sendSLARecommendations);
 		post("/frequency", Server::sentQueryFrequency);
 		post("/slearn", Server::sendSLearnStrategy);
@@ -96,6 +101,46 @@ public class Server {
 		
 		
 		return toR;
+	}
+	
+	public static Object getDecisionTree(Request req, Response res) {
+		JsonObject data = Json.parse(req.body()).asObject();
+		String sessionID = data.get("sessionID").asString();
+		Session s = sessionMap.get(sessionID);
+		
+		res.type("application/json");
+		
+		JsonObject toR = Json.object().add("tree", s.getTree());
+		
+		return toR;
+	}
+	
+	public static Object getDecisionTreeImage(Request req, Response res) throws IOException, InterruptedException {
+		String sessionID = req.params("session");
+		Session s = sessionMap.get(sessionID);
+		
+		System.out.println("Session ID: " + sessionID);
+		
+		ProcessBuilder pb = new ProcessBuilder("/usr/bin/dot", "-Tpng");
+		Process p = pb.start();
+		
+		
+		PrintWriter pw = new PrintWriter(p.getOutputStream());
+		pw.println(s.getTree());
+		pw.flush();
+		pw.close();
+		
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		InputStream is = p.getInputStream();
+		while (p.isAlive() || is.available() > 0) {
+			bos.write(is.read());
+		}
+		
+		System.out.println("Got " + bos.size() + " bytes of an image");
+		
+		res.type("image/png");
+		
+		return bos.toByteArray();
 	}
 	
 	public static Object sentQueryFrequency(Request req, Response res) {

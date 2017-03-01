@@ -165,6 +165,10 @@ public class Session {
     	return toR;
     }
     
+    public String getTree() {
+    	return getSelectedSLA().getModel().getDecisionTree();
+    }
+    
     public RecommendedSLA getSelectedSLA() {
     	if (this.slaIdx == -1)
     		return originalSLA;

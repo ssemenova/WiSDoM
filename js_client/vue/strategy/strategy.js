@@ -8,7 +8,8 @@ module.exports = {
             firstImg: true,
             lastImg: false,
             imgNumber: 1,
-            decisionTreePng: './assets/decision-tree/Slide1.png'
+            decisionTreePng: './assets/decision-tree/Slide1.png',
+            dt: false
         };
     },
 
@@ -22,7 +23,19 @@ module.exports = {
 
     methods: {
 
+        loadDT: function() {
+            axios.post("/tree", this.sla)
+                .then(res => {
+                    this.dt = res.data.tree;
+                    $("#dtModal").modal('show');
+                });
+
+        },
+        
         loadNext: function() {
+
+            console.log(JSON.stringify(this.sla));
+            
             if (this.imgNumber <= 16) {
                 this.imgNumber++;
                 this.firstImg = false;
@@ -37,15 +50,12 @@ module.exports = {
         checkSLA: function() {
             this.waiting = true;
             if (!this.sla) {
-                console.log("sla is false, clearing!");
                 this.strategy = false;
                 return;
             }
 
-            console.log("sending request...");
             axios.post("/slearn", this.sla)
                 .then(res => {
-                    console.log("got response");
                     this.strategy = res.data.schedule;
                     this.waiting = false;
                 });
@@ -55,7 +65,6 @@ module.exports = {
 
     watch: {
         sla: function () {
-            console.log("got an sla change: " + JSON.stringify(this.sla));
             this.checkSLA();
         }
     }

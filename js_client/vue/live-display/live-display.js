@@ -47,7 +47,7 @@ module.exports = {
             this.paused = false;
         },
 
-        
+
         provisionVM: function (vmID, vmType) {
             this.$set(this.vms, vmID, {"id": vmID,
                                        "state": "starting",
@@ -124,7 +124,7 @@ module.exports = {
                        {running,
                         booting,
                         "queriesProcessed": this.queriesProcessed});
-            
+
         },
 
         start: function() {

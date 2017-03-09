@@ -59,3 +59,12 @@
 .previous-button, .next-button {
     margin: 2em;
 }
+
+.align-left {
+  float: left;
+}
+
+img {
+  margin-right: auto;
+  margin-left: auto;
+}

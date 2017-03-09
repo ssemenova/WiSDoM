@@ -15,4 +15,9 @@
 
 body {
     font-family: Helvetica, Arial;
+    font-size: 15px;
+}
+
+p {
+  font-size: 15px;
 }

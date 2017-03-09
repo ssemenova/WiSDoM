@@ -42,7 +42,7 @@
   animation: blinker 0.8s linear infinite;
 }
 
-@keyframes blinker {  
+@keyframes blinker {
   50% { opacity: 0; }
 }
 
@@ -61,4 +61,12 @@
 
 .modal-dialog {
     width: 750px;
+}
+
+.align-right {
+  float: right;
+}
+
+.well {
+  padding: 9px 19px 19px 19px;
 }

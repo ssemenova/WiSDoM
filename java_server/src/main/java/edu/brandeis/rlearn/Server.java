@@ -121,7 +121,7 @@ public class Server {
 		
 		System.out.println("Session ID: " + sessionID);
 		
-		ProcessBuilder pb = new ProcessBuilder("/usr/bin/dot", "-Tpng");
+		ProcessBuilder pb = new ProcessBuilder("/usr/local/bin/dot", "-Tpng");
 		Process p = pb.start();
 		
 		

@@ -11,12 +11,12 @@
     <div v-if="numVMs != 0" class="controls">
       <i class="ptr fa fa-play"  v-on:click="play()" v-if="paused"></i>
       <i class="ptr fa fa-pause" v-on:click="pause()" v-if="!paused"></i>
-      <span class="blink_me" v-if="paused">actions taken: {{ messages }}</span>
-      <span v-if="!paused">actions taken: {{ messages }}</span>
+      <span class="align-right blink_me" v-if="paused"><b>{{ messages }}</b> actions taken</span>
+      <span class="align-right" v-if="!paused"><b>{{ messages }}</b> actions taken</span>
     </div>
 
 
-    
+
 
     <div id="expModal" class="modal fade" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
@@ -26,7 +26,6 @@
             <h4 class="modal-title">Experience for VM</h4>
           </div>
           <div class="modal-body">
-            <p>Here's the experience data for this bandit.</p>
             <table class="table table-striped">
               <thead>
                 <tr>
@@ -40,7 +39,8 @@
               </thead>
               <tbody>
                 <tr v-for="exps in experience">
-                  <td v-for="f in exps">
+                  <td v-for="(f, index) in exps">
+                    <span v-if="index == 6">9</span>
                     {{ f }}
                   </td>
                 </tr>
@@ -53,7 +53,7 @@
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
-    
+
 
     <span v-for="(value, key) in vms">
       <div class="well" v-show="value.shouldDisplay" v-bind:key="key">
@@ -73,7 +73,7 @@
                 <li v-for="q in value.queue"
                     class="list-complete-item"
                     v-bind:key="q.queryID">
-                  
+
                   <div :class="'strat-rec-img sphere t' + q.template"
 	               data-toggle="tooltip"
 	               :title="'Query ID: ' + q.queryID">

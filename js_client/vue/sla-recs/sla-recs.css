@@ -2,3 +2,7 @@
     margin-top: 1em;
     margin-bottom: 0px;
 }
+
+.form-horizontal {
+  padding-top: 2em;
+}

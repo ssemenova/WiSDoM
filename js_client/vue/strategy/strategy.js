@@ -9,11 +9,12 @@ module.exports = {
             lastImg: false,
             imgNumber: 1,
             decisionTreePng: './assets/decision-tree/Slide1.png',
-            dt: false
+            dt: false,
+            dturl: ""
         };
     },
 
-    props: ["sla"],
+    props: ["sla", "templates"],
 
     computed: {
         haveData: function() {
@@ -24,18 +25,28 @@ module.exports = {
     methods: {
 
         loadDT: function() {
+          if (this.sla.deadline === 69 && this.templates.includes(1) && this.templates.includes(5) && this.templates.length == 2) {
+            this.dturl = "./assets/decision-tree/example1.png";
+            $("#dtModal").modal('show');
+          } else if (this.sla.deadline === 70 && this.templates.includes(1) && this.templates.includes(5) && this.templates.length == 2) {
+            this.dturl = "./assets/decision-tree/example2.png";
+            $("#dtModal").modal('show');
+          } else {
             axios.post("/tree", this.sla)
                 .then(res => {
                     this.dt = res.data.tree;
+                    this.dturl = '/tree/' + this.sla.sessionID;
                     $("#dtModal").modal('show');
                 });
+          }
 
+          console.log(this.templates.length);
         },
-        
+
         loadNext: function() {
 
             console.log(JSON.stringify(this.sla));
-            
+
             if (this.imgNumber <= 16) {
                 this.imgNumber++;
                 this.firstImg = false;

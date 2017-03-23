@@ -39,9 +39,9 @@
         <div class="modal-body">
           <!--<p>Here's the decision tree model we used.</p>-->
           <a target="_blank"
-             :href="'/tree/' + sla.sessionID" >
+             v-bind:href="dturl" >
             <img class="img-responsive"
-                 :src="'/tree/' + sla.sessionID">
+                 v-bind:src="dturl">
           </a>
         </div>
         <div class="modal-footer">
@@ -51,7 +51,7 @@
                   data-dismiss="modal">See simple example</button>
           <a type="button" class="btn btn-default"
             target="_blank"
-            :href="'/tree/' + sla.sessionID" >
+            v-bind:href="dturl" >
             View larger
           </a>
         </div>

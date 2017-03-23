@@ -49,7 +49,8 @@
           </h3>
         </div>
         <div class="panel-body">
-          <strategy :sla="selectedSLA">
+          <strategy :sla="selectedSLA"
+                    :templates="templates">
           </strategy>
           <slearn-graph :sla="selectedSLA">
           </slearn-graph>

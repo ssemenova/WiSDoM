@@ -121,7 +121,11 @@ public class Server {
 		
 		System.out.println("Session ID: " + sessionID);
 		
-		ProcessBuilder pb = new ProcessBuilder("/usr/local/bin/dot", "-Tpng");
+		String dotPath = System.getenv("DOT_PATH");
+		if (dotPath == null)
+			dotPath = "/usr/bin/dot";
+		
+		ProcessBuilder pb = new ProcessBuilder(dotPath, "-Tpng");
 		Process p = pb.start();
 		
 		

@@ -8,40 +8,42 @@
     </h3>
   </div>
   <div class="panel-body" v-show="haveTemplates()">
-      <div id="slaPlot"></div>
-      <div class="row padding">
-          <div class="col-xs-12">
-              <p>Adjust the SLA deadline using the slider below. Current deadline: <b><span v-if="SLAType == 'Percentile'"> 90% of queries completed within </span> {{ deadline }} <span v-if="SLAType == 'PerQuery'">times the query latency in isolation</span> <span v-if="SLAType != 'PerQuery'">seconds</span></b>. We will add 60 seconds to the deadline to account for VM startup time.</p>
-          </div>
-          <div class="col-xs-10 col-xs-offset-1">
-              <div id="slider">
-                  <slider v-bind:min-value="minValue"
-                          v-bind:max-value="maxValue"
-                          v-on:value-changed="updateSLA"
-                          :disabled="saved">
-                  </slider>
-              </div>
-          </div>
-      </div>
-      <div class="row">
-          <div class="col-xs-8 col-xs-offset-1">
-              <div class="form-group">
-                  <label for="SLAType">SLA Type</label>
-                  <select v-model="SLAType" class="form-control" id="SLAType">
-                    <option>Max</option>
-                    <option>Average</option>
-                    <option>Percentile</option>
-                    <option>Per Query</option>
-                  </select>
-              </div>
-          </div>
-          <div class="col-xs-2">
-              <div id="saveBtn">
-                  <button v-on:click="save()" :class="{ btn: true, 'btn-primary': true, disabled: saved}" class="pull-right">
-                      Save
-                  </button>
-              </div>
-          </div>
+    <div id="slaPlot"></div>
+    <div class="row padding">
+      <div class="col-xs-10 col-xs-offset-1">
+        <p>Current deadline: <b><span v-if="SLAType == 'Percentile'"> 90% of queries completed within </span> {{ deadline }} <span v-if="SLAType == 'Per Query'">times the query latency in isolation</span> <span v-if="SLAType != 'Per Query'">seconds</span></b>. We will add 60 seconds to the deadline to account for VM startup time.</p>
       </div>
     </div>
+    <div class="row">
+      <div class="col-xs-12 col-sm-4 col-sm-offset-1">
+        <div class="form-group">
+          <label for="S:A">Current Deadline</label>
+          <div class="input-group">
+            <input type="number" class="form-control" id="SLA" v-model="deadline" :min="minValue" :max="maxValue" :disabled="saved">
+            <span class="input-group-addon" v-if="SLAType != 'Per Query'">seconds</span>
+            <span class="input-group-addon" v-if="SLAType == 'Per Query'">times</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-4">
+          <div class="form-group">
+            <label for="SLAType">SLA Type</label>
+            <select v-model="SLAType" class="form-control" id="SLAType" :disabled="saved">
+              <option>Max</option>
+              <option>Average</option>
+              <option>Percentile</option>
+              <option>Per Query</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-2">
+          <div id="saveBtn">
+              <button v-on:click="save()" :class="{ btn: true, 'btn-primary': true, disabled: saved}" class="pull-right">
+                  Save
+              </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

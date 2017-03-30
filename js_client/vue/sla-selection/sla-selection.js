@@ -23,9 +23,9 @@ module.exports = {
         return {
             groups: [],
             latencies: [],
-            deadline: 150,
+            deadline: 10,
             minValue: 9,
-            maxValue: 32,
+            maxValue: 35,
             saved: false,
             graphColors: [],
             SLAType: 'Max'
@@ -46,8 +46,7 @@ module.exports = {
         },
 
         save: function () {
-            this.$emit("deadline-changed", (this.SLAType != "Per Query" ?
-                                            parseFloat(this.deadline)
+            this.$emit("deadline-changed", (this.SLAType != "Per Query" ? parseFloat(this.deadline)
                                             : 15.00));
             this.saved = true;
             if (this.deadline && this.mode) {
@@ -61,11 +60,9 @@ module.exports = {
         },
 
         updateSLA: function(value) {
-            this.deadline = value;
             var x = this.x;
             var y = this.y;
 
-            
             const plt = document.getElementById("slaPlot");
             try {
                 Plotly.deleteTraces(plt, 30);
@@ -75,14 +72,14 @@ module.exports = {
                 } else {
                     const ourLatencies = [];
                     const templateIDs = deepcopy(this.templates);
-                                
+
                     for (let id in this.latencies) {
                         let iid = parseInt(id);
                         if (templateIDs.indexOf(iid) == -1)
                             continue;
                         ourLatencies.push(this.latencies[id]);
                     }
-                    
+
                     y = x.map((x, idx) => {
                         return (ourLatencies["" + idx] * this.deadline)
                             / 1000;
@@ -212,9 +209,12 @@ module.exports = {
                 this.deadline = 2;
             } else {
                 this.minValue = 9;
-                this.maxValue = 32;
-                this.deadline = 150;
+                this.maxValue = 35;
+                this.deadline = 10;
             }
+        },
+        deadline: function() {
+          this.updateSLA();
         }
     },
 

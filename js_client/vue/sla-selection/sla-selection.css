@@ -22,3 +22,11 @@
 .panel-body {
     overflow-x: hidden;
 }
+
+.inline {
+  display: inline-block;
+}
+
+.control-label {
+  line-height: 2.4em;
+}

@@ -65,10 +65,14 @@ module.exports = {
                 return;
             }
 
+            var panel = $('#results');
+            panel.addClass('big-hacky-panel');
+
             axios.post("/slearn", this.sla)
                 .then(res => {
                     this.strategy = res.data.schedule;
                     this.waiting = false;
+                    panel.removeClass('big-hacky-panel');
                 });
 
         }

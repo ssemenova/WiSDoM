@@ -10,7 +10,7 @@
             <p align="center">Waiting for data...</p>
           </div>
           <div id="rlearnGraph" v-show="haveData()"></div>
-          <div id="rlearnGraphPenalty" v-show="haveData()"></div>
+          <div id="rlearnGraphPenalty" v-show="false && haveData()"></div>
           <dl class="dl-horizontal" v-show="haveData()">
             <dt>Running VMs</dt> <dd>{{stats.running}}</dd>
             <dt>Booting VMs</dt> <dd>{{stats.booting}}</dd>

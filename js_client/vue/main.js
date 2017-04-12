@@ -62,7 +62,6 @@ module.exports = {
         },
 
         runningVMCount: function (c) {
-            console.log("Got new running VM count!");
             this.runningVMs = c;
         }
     }

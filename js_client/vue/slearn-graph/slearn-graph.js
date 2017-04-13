@@ -38,8 +38,14 @@ module.exports = {
                 title: (showActual ? "Actual Cost" : "Predicted Cost")
             };
 
-            const x = ["FFD", "FFI", "Pack9", "WiSeDB"];
-            const y = [this.costs.ffd, this.costs.ffi, this.costs.pack9, this.costs.wisedb];
+            const x = ["FFD",
+                       //"FFI",
+                       //"Pack9",
+                       "WiSeDB"];
+            const y = [this.costs.ffd,
+                       //this.costs.ffi,
+                       //this.costs.pack9,
+                       this.costs.wisedb];
 
             if ((!this.waitingOnCloud) && this.requestedCloud) {
                 // TODO: submit to backend

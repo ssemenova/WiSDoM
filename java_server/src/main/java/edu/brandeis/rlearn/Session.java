@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.eclipsesource.json.Json;
@@ -165,8 +166,11 @@ public class Session {
     	return toR;
     }
     
+    
     public String getTree() {
-    	return getSelectedSLA().getModel().getDecisionTree();
+    	String toR = getSelectedSLA().getModel().getDecisionTree();
+    	System.out.println(toR);
+    	return toR;
     }
     
     public RecommendedSLA getSelectedSLA() {

@@ -5,7 +5,7 @@
   </div>
 
   <div v-show="!waiting">
-    <p>Select an SLA from below.</p>
+    <p>Here's some SLAs that represent cost vs. performance tradeoffs in your workload. The cost displayed is for a workload with five queries of each template. Select an SLA from below to see a new schedule.</p>
   </div>
   
   <div v-if="!waiting && correctMode() && results">

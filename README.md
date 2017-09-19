@@ -1,4 +1,6 @@
 # WiSDoM
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fssemenova%2FWiSDoM.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fssemenova%2FWiSDoM?ref=badge_shield)
+
 ## [W]orkload Adv[i]sor [S]ervice [D]em[o] [M]odule
 
 To run, execute `Server.java` with the following environmental variables set:
@@ -11,3 +13,7 @@ install it with `brew install homebrew/science/glpk` or Arch with `pacman -S glp
 1. cd to `js_client` directory
 2. run `npm install`
 3. run `make`
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fssemenova%2FWiSDoM.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fssemenova%2FWiSDoM?ref=badge_large)
